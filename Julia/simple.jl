@@ -1,11 +1,13 @@
 using Agents
 include("request-3d-bp-api.jl")
 include("data.jl")
+include("random-hex-color.jl")
 
 @agent struct Box(GridAgent{3})
     is_stacked::Bool = false
     WHD::Tuple{Int, Int, Int} = (0, 0, 0)
     final_pos::Tuple{Int, Int, Int} = (0, 0, 0)
+    color::String = ""
 end
 
 @agent struct Robot(GridAgent{3})
@@ -59,6 +61,7 @@ function initialize_boxes(boxes, model, padding=5)
             println("Box dimensions: ", box_agent.WHD)
             box_agent.pos = (x, div(box_agent.WHD[2], 2), 20)
             box_agent.final_pos = Tuple(box["position"])
+            box_agent.color = random_hex_color()
 
             println("Original box position: ", box_agent.pos)
             println("Final box position: ", box_agent.final_pos)

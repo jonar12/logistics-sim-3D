@@ -62,6 +62,7 @@ const Scene = ({ boxes, container }) => {
 					key={index}
 					position={[box.pos[0], box.pos[1], box.pos[2]]}
 					dimensions={[box.WHD[0], box.WHD[1], box.WHD[2]]}
+					color={box.color}
 				/>
 			))}
 
