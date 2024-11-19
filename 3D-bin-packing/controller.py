@@ -12,7 +12,7 @@ def controller(contenedor, cajas):
         partno=contenedor.id,
         WHD=(contenedor.width, contenedor.height, contenedor.depth),
         max_weight=28080,
-        corner=15,
+        corner=0,
         put_type=0
     )
 
