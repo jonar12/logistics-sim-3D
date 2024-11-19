@@ -2,9 +2,9 @@ function generate_sample_data(num_boxes::Int)
     # Generate container data
     contenedor = Dict(
         "id" => 1,
-        "width" => rand(80:150),
-        "height" => rand(80:150),
-        "depth" => rand(150:300)
+        "width" => 100,
+        "height" => 100,
+        "depth" => 100
     )
 
     # Generate random boxes

@@ -73,12 +73,12 @@ function initialize_boxes(boxes, model, padding=5)
 end
 
 function move_towards(agent, target_pos, model)
-    # Calculate step for each axis
+    # Calcular paso para caja eje x, z y y
     dx = sign(target_pos[1] - agent.pos[1])
     dz = sign(target_pos[3] - agent.pos[3])
     dy = sign(target_pos[2] - agent.pos[2])
 
-    # Attempt to move along x-axis first
+    # Moverse primero en el eje x
     if dx != 0
         new_pos = (agent.pos[1] + dx, agent.pos[2], agent.pos[3])
         if is_valid_position(new_pos, model)
@@ -87,7 +87,7 @@ function move_towards(agent, target_pos, model)
         end
     end
 
-    # If x-axis movement is complete or invalid, move along z-axis
+    # Si el movimiento en x no es valido o se completó, moverse en el eje z
     if dz != 0
         new_pos = (agent.pos[1], agent.pos[2], agent.pos[3] + dz)
         if is_valid_position(new_pos, model)
@@ -96,7 +96,7 @@ function move_towards(agent, target_pos, model)
         end
     end
 
-    # If both x and z-axis movements are complete or invalid, move along y-axis
+    # Si los movimientos en x y z no son validos o se completaron, moverse en el eje y
     if dy != 0
         new_pos = (agent.pos[1], agent.pos[2] + dy, agent.pos[3])
         if is_valid_position(new_pos, model)
@@ -108,7 +108,7 @@ end
 
 
 function is_valid_position(pos, model)
-    # Check if the position is within bounds and has no other agents
+    # Verificar si la nueva posición esta dentro de los limites del modelo
     in_bounds = all(pos .>= (0, 0, 0)) && all(pos .< model.griddims)
     # no_collision = isempty(agents_at(pos, model))
     return in_bounds
