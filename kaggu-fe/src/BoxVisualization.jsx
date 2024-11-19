@@ -58,6 +58,7 @@ const BoxVisualization = () => {
 	const [step, setStep] = useState(0);
 	const [loading, setLoading] = useState(false);
 	const [error, setError] = useState(null);
+	const [isRunning, setIsRunning] = useState(false); // Track if the simulation is running
 
 	// Initialize simulation
 	const initializeSimulation = async () => {
@@ -71,14 +72,10 @@ const BoxVisualization = () => {
 		} catch (error) {
 			let errorMessage = 'Failed to initialize simulation';
 			if (error.response) {
-				// The request was made and the server responded with a status code
-				// that falls out of the range of 2xx
 				errorMessage = `Server error: ${error.response.status}`;
 			} else if (error.request) {
-				// The request was made but no response was received
 				errorMessage = 'No response from server';
 			} else {
-				// Something happened in setting up the request
 				errorMessage = error.message;
 			}
 			setError(errorMessage);
@@ -93,7 +90,6 @@ const BoxVisualization = () => {
 		if (!simulationId) return;
 
 		try {
-			setLoading(true);
 			setError(null);
 
 			const { data } = await api.get(`/simulations/${simulationId}`);
@@ -110,10 +106,19 @@ const BoxVisualization = () => {
 			}
 			setError(errorMessage);
 			console.error('Error details:', error);
-		} finally {
-			setLoading(false);
 		}
 	};
+
+	// Handle continuous simulation
+	useEffect(() => {
+		let interval;
+		if (isRunning) {
+			interval = setInterval(() => {
+				stepSimulation();
+			}, 100); // Step every 100 ms
+		}
+		return () => clearInterval(interval); // Cleanup on unmount or when `isRunning` changes
+	}, [isRunning, simulationId]);
 
 	return (
 		<Card padding="large" variation="elevated">
@@ -130,11 +135,11 @@ const BoxVisualization = () => {
 					</Button>
 
 					<Button
-						onClick={stepSimulation}
-						isDisabled={loading || simulationId === null}
+						onClick={() => setIsRunning(!isRunning)}
+						isDisabled={simulationId === null}
 						variation="primary"
 					>
-						Step Simulation
+						{isRunning ? 'Pause Simulation' : 'Start Simulation'}
 					</Button>
 
 					{loading && <Loader size="small" />}
