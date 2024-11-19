@@ -1,5 +1,6 @@
 include("simple.jl")
-using Genie, Genie.Renderer.Json, Genie.Requests, UUIDs, Agents, HTTP
+using Genie, Genie.Requests, UUIDs, Agents, HTTP
+import Genie.Renderer.Json: json as genie_json
 
 # Diccionarios de simulaciones y pasos
 instances = Dict()
@@ -16,7 +17,7 @@ route("/simulations", method=POST) do
     instances[id] = model
     step_counter[id] = 0
 
-    json(Dict("Location" => "/simulations/$id"))
+    genie_json(Dict("Location" => "/simulations/$id"))
 end
 
 # Ruta para ejecutar pasos
@@ -32,7 +33,7 @@ route("/simulations/:id") do
     boxes = [agent for agent in allagents(model) if agent isa Box]
     robots = [agent for agent in allagents(model) if agent isa Robot]
 
-    json(Dict(
+    genie_json(Dict(
         "step" => step_counter[simulation_id],
         "boxes" => boxes,
         "robots" => robots
@@ -40,9 +41,9 @@ route("/simulations/:id") do
 end
 
 Genie.config.run_as_server = true
-Genie.config.cors_headers["Access-Control-Allow-Origin"] = "*"
-Genie.config.cors_headers["Access-Control-Allow-Headers"] = "Content-Type"
-Genie.config.cors_headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS" 
-Genie.config.cors_allowed_origins = ["*"]
+Genie.config.cors_headers["Access-Control-Allow-Origin"] = "http://localhost:5173"  # Your frontend origin specifically
+Genie.config.cors_headers["Access-Control-Allow-Headers"] = "Content-Type, Accept"
+Genie.config.cors_headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS"
+Genie.config.cors_allowed_origins = ["http://localhost:5173"]  # Your frontend origin specifically
 
 up()
