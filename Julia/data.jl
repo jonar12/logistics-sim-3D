@@ -2,9 +2,9 @@ function generate_sample_data(num_boxes::Int)
     # Generate container data
     contenedor = Dict(
         "id" => 1,
-        "width" => 100,
-        "height" => 100,
-        "depth" => 100
+        "width" => 20,
+        "height" => 20,
+        "depth" => 20
     )
 
     # Generate random boxes
@@ -26,25 +26,27 @@ function generate_sample_data(num_boxes::Int)
     return data
 end
 
-data = Dict(
-    "contenedor" => Dict(
-        "id" => 1,
-        "width" => 60,
-        "height" => 60,
-        "depth" => 60
-    ),
-    "cajas" => [
-        Dict(
-            "id" => 1,
-            "width" => 40,
-            "height" => 20,
-            "depth" => 20
-        ),
-        Dict(
-            "id" => 2,
-            "width" => 30,
-            "height" => 20,
-            "depth" => 20
-        )
-    ]
-)
+data = generate_sample_data(20)
+
+# data = Dict(
+#     "contenedor" => Dict(
+#         "id" => 1,
+#         "width" => 60,
+#         "height" => 60,
+#         "depth" => 60
+#     ),
+#     "cajas" => [
+#         Dict(
+#             "id" => 1,
+#             "width" => 40,
+#             "height" => 20,
+#             "depth" => 20
+#         ),
+#         Dict(
+#             "id" => 2,
+#             "width" => 30,
+#             "height" => 20,
+#             "depth" => 20
+#         )
+#     ]
+# )
