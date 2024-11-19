@@ -20,23 +20,10 @@ function initialize_model(griddims, n_boxes)
     model = ABM(Union{Box, Robot}, space)
 
     # Obtener información de cajas
-    box_data = getBoxAndItem(data)
+    boxes = getBoxAndItem(data)
 
-    # # Crear cajas a partir de la información obtenida
-    for box in box_data
-        if box["id"] isa Int
-            box_agent = add_agent!(Box, model)
-            box_agent.is_stacked = false
-            box_agent.width = box["width"]
-            box_agent.height = box["height"]
-            box_agent.depth = box["depth"]
-            box_agent.final_pos = Tuple(box["position"])
-        end
-    end
-
-    for agent in allagents(model)
-        print(agent)
-    end
+    # Crear cajas a partir de la información obtenida
+    initialize_boxes(boxes, model)
 
     # Crear robots
     add_agent!(Robot, model)
@@ -50,10 +37,29 @@ end
 
 function agent_step!(agent::Box, model)
     # El agente Box no realiza ninguna acción
-    println(agent)
 end
 
 function getBoxAndItem(data)
     res = post_request("http://localhost:5050/setItemAndBox", data)
     return res
+end
+
+# TODO: Acomodar cajas en una linea con cierto padding
+function initialize_boxes(boxes, model, padding=5)
+    x = 0
+
+    for box in boxes
+        if box["id"] isa Int
+            box_agent = add_agent!(Box, model)
+            box_agent.is_stacked = false
+            box_agent.width = box["width"]
+            box_agent.height = box["height"]
+            box_agent.depth = box["depth"]
+            box_agent.pos = (x, div(box_agent.height, 2), 0)
+            box_agent.final_pos = Tuple(box["position"])
+
+            # Incrementar x por el ancho de la caja + un padding de separación entre cajas
+            x += box["width"] + padding
+        end
+    end
 end

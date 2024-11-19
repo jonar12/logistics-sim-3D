@@ -42,7 +42,7 @@ const Scene = ({ boxes }) => {
 			{boxes.map((box, index) => (
 				<Box
 					key={index}
-					position={[box.final_pos[0], box.final_pos[1], box.final_pos[2]]}
+					position={[box.pos[0], box.pos[1], box.pos[2]]}
 					dimensions={[box.width, box.height, box.depth]}
 				/>
 			))}
