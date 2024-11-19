@@ -26,8 +26,6 @@ function generate_sample_data(num_boxes::Int)
     return data
 end
 
-# data = generate_sample_data(5)
-
 data = Dict(
     "contenedor" => Dict(
         "id" => 1,
@@ -38,13 +36,13 @@ data = Dict(
     "cajas" => [
         Dict(
             "id" => 1,
-            "width" => 20,
+            "width" => 40,
             "height" => 20,
             "depth" => 20
         ),
         Dict(
             "id" => 2,
-            "width" => 50,
+            "width" => 30,
             "height" => 20,
             "depth" => 20
         )

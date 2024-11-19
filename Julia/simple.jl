@@ -15,7 +15,7 @@ end
 
 function initialize_model(griddims)
     space = GridSpace(griddims; periodic=false)
-    model = ABM(Union{Box, Robot}, space; agent_step!, properties = Dict(:griddims => griddims, :corners => []))
+    model = ABM(Union{Box, Robot}, space; agent_step!, properties = Dict(:griddims => griddims, :container => data["contenedor"]))
 
     # Obtener información de cajas
     boxes = getBoxAndItem(data)
@@ -114,7 +114,6 @@ function is_valid_position(pos, model)
 end
 
 function rotate_box(rotation_code::Int, width::Int, height::Int, depth::Int)
-    print("Rotation code: ", rotation_code)
     # Define rotation mappings based on the rotation code
     mapping = Dict(
         0 => (width, height, depth),      # RT_WHD
