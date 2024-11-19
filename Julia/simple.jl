@@ -4,9 +4,7 @@ include("data.jl")
 
 @agent struct Box(GridAgent{3})
     is_stacked::Bool = false
-    width::Int = 0
-    height::Int = 0
-    depth::Int = 0
+    WHD::Tuple{Int, Int, Int} = (0, 0, 0)
     final_pos::Tuple{Int, Int, Int} = (0, 0, 0)
 end
 
@@ -57,10 +55,9 @@ function initialize_boxes(boxes, model, padding=5)
         if box["id"] isa Int
             box_agent = add_agent!(Box, model)
             box_agent.is_stacked = false
-            box_agent.width = box["width"]
-            box_agent.height = box["height"]
-            box_agent.depth = box["depth"]
-            box_agent.pos = (x, div(box_agent.height, 2), 20)
+            box_agent.WHD = rotate_box(box["rotation_type"], box["width"], box["height"], box["depth"])
+            println("Box dimensions: ", box_agent.WHD)
+            box_agent.pos = (x, div(box_agent.WHD[2], 2), 20)
             box_agent.final_pos = Tuple(box["position"])
 
             println("Original box position: ", box_agent.pos)
@@ -114,4 +111,20 @@ function is_valid_position(pos, model)
     in_bounds = all(pos .>= (0, 0, 0)) && all(pos .< model.griddims)
     # no_collision = isempty(agents_at(pos, model))
     return in_bounds
+end
+
+function rotate_box(rotation_code::Int, width::Int, height::Int, depth::Int)
+    print("Rotation code: ", rotation_code)
+    # Define rotation mappings based on the rotation code
+    mapping = Dict(
+        0 => (width, height, depth),      # RT_WHD
+        1 => (height, width, depth),      # RT_HWD
+        2 => (height, depth, width),      # RT_HDW
+        3 => (depth, height, width),      # RT_DHW
+        4 => (depth, width, height),      # RT_DWH
+        5 => (width, depth, height)       # RT_WDH
+    )
+    
+    # Return the modified dimensions
+    return mapping[rotation_code]
 end

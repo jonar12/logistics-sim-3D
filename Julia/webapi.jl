@@ -19,7 +19,7 @@ route("/simulations", method=POST) do
 
     println("corners: ", model.corners)
 
-    genie_json(Dict("Location" => "/simulations/$id"))
+    genie_json(Dict("Location" => "/simulations/$id", "container_corners" => model.corners))
 end
 
 # Ruta para ejecutar pasos
