@@ -15,9 +15,9 @@ end
 end
 
 
-function initialize_model(griddims, n_boxes)
+function initialize_model(griddims)
     space = GridSpace(griddims; periodic=false)
-    model = ABM(Union{Box, Robot}, space; agent_step!, properties = Dict(:griddims => griddims))
+    model = ABM(Union{Box, Robot}, space; agent_step!, properties = Dict(:griddims => griddims, :corners => []))
 
     # Obtener información de cajas
     boxes = getBoxAndItem(data)
@@ -51,7 +51,7 @@ end
 
 # TODO: Acomodar cajas en una linea con cierto padding
 function initialize_boxes(boxes, model, padding=5)
-    x = 0
+    x = 40
 
     for box in boxes
         if box["id"] isa Int
@@ -60,7 +60,7 @@ function initialize_boxes(boxes, model, padding=5)
             box_agent.width = box["width"]
             box_agent.height = box["height"]
             box_agent.depth = box["depth"]
-            box_agent.pos = (x, div(box_agent.height, 2), 0)
+            box_agent.pos = (x, div(box_agent.height, 2), 20)
             box_agent.final_pos = Tuple(box["position"])
 
             println("Original box position: ", box_agent.pos)
@@ -68,6 +68,8 @@ function initialize_boxes(boxes, model, padding=5)
 
             # Incrementar x por el ancho de la caja + un padding de separación entre cajas
             x += box["width"] + padding
+        else 
+            push!(model.corners, Tuple(box["position"]))
         end
     end
 end
