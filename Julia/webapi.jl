@@ -1,4 +1,5 @@
-using Genie, Genie.Renderer.Json, UUIDs, Agents
+include("simple.jl")
+using Genie, Genie.Renderer.Json, Genie.Requests, UUIDs, Agents, HTTP
 
 # Diccionarios de simulaciones y pasos
 instances = Dict()
@@ -8,18 +9,18 @@ step_counter = Dict{String, Int}()
 route("/simulations", method=POST) do
     payload = jsonpayload()
     griddims = (100, 100, 100)  # Tamaño del contenedor
-    n_boxes = get(payload, "n_boxes", 20)
+    n_boxes = 20
 
     model = initialize_model(griddims, n_boxes)
     id = string(uuid1())
     instances[id] = model
     step_counter[id] = 0
 
-    json(Dict("simulation_id" => id, "message" => "Simulación creada"))
+    json(Dict("Location" => "/simulations/$id"))
 end
 
 # Ruta para ejecutar pasos
-route("/simulations/:id/step") do
+route("/simulations/:id") do
     simulation_id = payload(:id)
     model = instances[simulation_id]
 
@@ -37,3 +38,11 @@ route("/simulations/:id/step") do
         "robots" => robots
     ))
 end
+
+Genie.config.run_as_server = true
+Genie.config.cors_headers["Access-Control-Allow-Origin"] = "*"
+Genie.config.cors_headers["Access-Control-Allow-Headers"] = "Content-Type"
+Genie.config.cors_headers["Access-Control-Allow-Methods"] = "GET,POST,PUT,DELETE,OPTIONS" 
+Genie.config.cors_allowed_origins = ["*"]
+
+up()
