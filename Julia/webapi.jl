@@ -9,15 +9,17 @@ step_counter = Dict{String, Int}()
 # Ruta para inicializar simulación
 route("/simulations", method=POST) do
     payload = jsonpayload()
-    griddims = (100, 100, 100)  # Tamaño del contenedor
+    griddims = (200, 150, 200)  # Tamaño del contenedor
     n_boxes = 20
 
-    model = initialize_model(griddims, n_boxes)
+    model = initialize_model(griddims)
     id = string(uuid1())
     instances[id] = model
     step_counter[id] = 0
 
-    genie_json(Dict("Location" => "/simulations/$id"))
+    println("corners: ", model.corners)
+
+    genie_json(Dict("Location" => "/simulations/$id", "container_corners" => model.corners))
 end
 
 # Ruta para ejecutar pasos
