@@ -2,6 +2,7 @@ from Caja import Caja
 from Contenedor import Contenedor
 from py3dbp import Packer, Bin, Item, Painter
 
+
 def controller(contenedor, cajas):
     # Inicializar packer
     packer = Packer()
@@ -9,7 +10,7 @@ def controller(contenedor, cajas):
     # Inicializar contenedor
     box = Bin(
         partno=contenedor.id,
-        WHD=(contenedor.width,contenedor.height,contenedor.depth),
+        WHD=(contenedor.width, contenedor.height, contenedor.depth),
         max_weight=28080,
         corner=15,
         put_type=0
@@ -65,23 +66,4 @@ def controller(contenedor, cajas):
         #     fontsize=10
         # )
         # fig.show()
-    print(cajas_output)
     return cajas_output
-
-# Mock data for the container and boxes
-contenedor = Contenedor(
-    id="20ft_Container",
-    width=500,  # Length in cm
-    height=500,  # Height in cm
-    depth=500  # Depth in cm
-)
-
-cajas = [
-    Caja(id="Box1", width=50, height=50, depth=50),
-    Caja(id="Box2", width=40, height=40, depth=40),
-    Caja(id="Box3", width=60, height=60, depth=60),
-    Caja(id="Box4", width=30, height=30, depth=30)
-]
-
-# Call the controller function with the mock data
-controller(contenedor, cajas)
