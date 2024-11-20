@@ -1,0 +1,147 @@
+import pygame
+from pygame.locals import *
+
+# Cargamos las bibliotecas de OpenGL
+from OpenGL.GL import *
+from OpenGL.GLU import *
+from OpenGL.GLUT import *
+
+import random
+import math
+
+
+class Caja:
+    def __init__(self, dim, vel, textures, txtIndex, pos, body):
+        # Se inicializa las coordenadas de los vertices del cubo
+        self.vertexCoords = [1,1,1,1,1,-1,1,-1,-1,1,-1,1,-1,1,1,-1,1,-1,-1,-1,-1,-1,-1,1,]
+
+        self.body = body
+
+        self.dim = dim
+        # Se inicializa una posicion aleatoria en el tablero
+        # self.position = [random.randint(-dim+15, dim-15), 2, random.randint(-dim+15, dim-15)]
+        self.position = [pos[0], 0.0, pos[2]]
+
+        # Inicializar las coordenadas (x,y,z) del cubo en el tablero
+        # almacenandolas en el vector position
+        # ...
+        # Se inicializa un vector de direccion aleatorio
+        dirX = random.randint(-10, 10) or 1
+        dirZ = random.randint(-1, 1) or 1
+        magnitude = math.sqrt(dirX * dirX + dirZ * dirZ) * vel
+        self.direction = [dirX / magnitude, 0, dirZ / magnitude]
+        # El vector aleatorio debe de estar sobre el plano XZ (la altura en Y debe ser fija)
+        # Se normaliza el vector de direccion
+        # ...
+        # Se cambia la maginitud del vector direccion con la variable vel
+        # ...
+        
+        #Arreglo de texturas
+        self.textures = textures
+
+        #Index de la textura a utilizar
+        self.txtIndex = txtIndex
+
+        #Control variable for drawing
+        self.alive = True
+
+    # def update(self):
+    #     # Se debe de calcular la posible nueva posicion del cubo a partir de su
+    #     # posicion acutual (position) y el vector de direccion (direction)
+    #     # ...
+    #     newX = self.position[0] + self.direction[0]
+    #     newZ = self.position[2] + self.direction[2]
+    #     if newX < -self.dim or newX > self.dim:
+    #         self.direction[0] *= -1
+    #     else:
+    #         self.position[0] = newX
+    #     if newZ < -self.dim or newZ > self.dim:
+    #         self.direction[2] *= -1
+    #     else:
+    #         self.position[2] = newZ
+
+        # Se debe verificar que el objeto cubo, con su nueva posible direccion
+        # no se salga del plano actual (DimBoard)
+        # ...
+
+    def draw(self):
+        if self.alive:
+            glPushMatrix()
+            glTranslatef(self.position[0], self.position[1], self.position[2])
+            glScaled(2, 2, 2)
+            glColor3f(1.0, 1.0, 1.0)
+
+            glEnable(GL_TEXTURE_2D)
+            glBindTexture(GL_TEXTURE_2D, self.textures[self.txtIndex])
+
+            glBegin(GL_QUADS)
+            
+            point = self.body[0]
+            point1 = self.body[1]
+            point2 = self.body[2]
+
+            # Dibujado de las caras de la caja
+
+            # Cara frontal
+            glTexCoord2f(0.0, 0.0)
+            glVertex3d(self.position[0], self.position[1], self.position[2])
+            glTexCoord2f(0.0, 1.0)
+            glVertex3d(self.position[0], self.position[1] + point1, self.position[2])
+            glTexCoord2f(1.0, 1.0)
+            glVertex3d(self.position[0] + point, self.position[1] + point1, self.position[2])
+            glTexCoord2f(1.0, 0.0)
+            glVertex3d(self.position[0] + point, self.position[1], self.position[2])
+
+            # Cara trasera
+            glTexCoord2f(0.0, 0.0)
+            glVertex3d(self.position[0], self.position[1], self.position[2] + point2)
+            glTexCoord2f(0.0, 1.0)
+            glVertex3d(self.position[0], self.position[1] + point1, self.position[2] + point2)
+            glTexCoord2f(1.0, 1.0)
+            glVertex3d(self.position[0] + point, self.position[1] + point1, self.position[2] + point2)
+            glTexCoord2f(1.0, 0.0)
+            glVertex3d(self.position[0] + point, self.position[1], self.position[2] + point2)
+
+            # Cara izquierda
+            glTexCoord2f(0.0, 0.0)
+            glVertex3d(self.position[0], self.position[1], self.position[2])
+            glTexCoord2f(0.0, 1.0)
+            glVertex3d(self.position[0], self.position[1] + point1, self.position[2])
+            glTexCoord2f(1.0, 1.0)
+            glVertex3d(self.position[0], self.position[1] + point1, self.position[2] + point2)
+            glTexCoord2f(1.0, 0.0)
+            glVertex3d(self.position[0], self.position[1], self.position[2] + point2)
+
+            # Cara derecha
+            glTexCoord2f(0.0, 0.0)
+            glVertex3d(self.position[0] + point, self.position[1], self.position[2])
+            glTexCoord2f(0.0, 1.0)
+            glVertex3d(self.position[0] + point, self.position[1] + point1, self.position[2])
+            glTexCoord2f(1.0, 1.0)
+            glVertex3d(self.position[0] + point, self.position[1] + point1, self.position[2] + point2)
+            glTexCoord2f(1.0, 0.0)
+            glVertex3d(self.position[0] + point, self.position[1], self.position[2] + point2)
+
+            # Cara superior
+            glTexCoord2f(0.0, 0.0)
+            glVertex3d(self.position[0], self.position[1] + point1, self.position[2])
+            glTexCoord2f(0.0, 1.0)
+            glVertex3d(self.position[0], self.position[1] + point1, self.position[2] + point2)
+            glTexCoord2f(1.0, 1.0)
+            glVertex3d(self.position[0] + point, self.position[1] + point1, self.position[2] + point2)
+            glTexCoord2f(1.0, 0.0)
+            glVertex3d(self.position[0] + point, self.position[1] + point1, self.position[2])
+
+            # Cara inferior
+            glTexCoord2f(0.0, 0.0)
+            glVertex3d(self.position[0], self.position[1], self.position[2])
+            glTexCoord2f(0.0, 1.0)
+            glVertex3d(self.position[0], self.position[1], self.position[2] + point2)
+            glTexCoord2f(1.0, 1.0)
+            glVertex3d(self.position[0] + point, self.position[1], self.position[2] + point2)
+            glTexCoord2f(1.0, 0.0)
+            glVertex3d(self.position[0] + point, self.position[1], self.position[2])
+
+            glEnd()
+            glDisable(GL_TEXTURE_2D)
+            glPopMatrix()
