@@ -13,7 +13,7 @@ from flask_cors import cross_origin
 app = flask.Flask(__name__)
 
 # load data
-with open('widadvance.json',encoding='utf-8') as f:
+with open('../3D-bin-packing/widadvance.json',encoding='utf-8') as f:
     alldata = json.load(f)
 
 # a simple page that says hello
