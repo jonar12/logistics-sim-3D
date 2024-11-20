@@ -26,7 +26,7 @@ function generate_sample_data(num_boxes::Int)
     return data
 end
 
-data = generate_sample_data(30)
+data = generate_sample_data(10)
 
 # data = Dict(
 #     "contenedor" => Dict(
