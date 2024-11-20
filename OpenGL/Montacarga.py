@@ -10,16 +10,17 @@ import random
 import math
 
 class Montacarga:
-    def __init__(self, dim, vel, textures):
+    def __init__(self, dim, vel, obj, textures):
+        self.textures = textures
         self.dim = dim
-        self.position = [0, 6, 0]
+        self.position = [0, 0, 0]
         dirX = random.randint(-10, 10) or 1
         dirZ = random.randint(-1, 1) or 1
         magnitude = math.sqrt(dirX**2 + dirZ**2)
         self.Direction = [(dirX / magnitude), 0, (dirZ / magnitude)]
         self.angle = 0
         self.vel = vel
-        self.textures = textures
+        self.scene = obj
         self.platformHeight = -1.5
         self.platformUp = False
         self.platformDown = False
@@ -113,127 +114,152 @@ class Montacarga:
     def draw(self):
         glPushMatrix()
         glTranslatef(self.position[0], self.position[1], self.position[2])
-        glRotatef(self.angle, 0, 1, 0)
-        glScaled(5, 5, 5)
+        glRotatef(self.angle, 0.0, 1.0, 0.0)
+        glScaled(0.03, 0.03, 0.03)
+        glEnable(GL_LIGHTING)
+        glEnable(GL_LIGHT0)
+        glEnable(GL_COLOR_MATERIAL)
+        glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
         glColor3f(1.0, 1.0, 1.0)
+
+        # Dibujar el Montacarga
+        for _, mesh in self.scene.meshes.items():
+            glBegin(GL_TRIANGLES)
+            for face in mesh.faces:
+                for vertex_i in face:
+                    vertex = self.scene.vertices[vertex_i]
+                    glVertex3f(*vertex)
+            glEnd()
+
+        glDisable(GL_COLOR_MATERIAL)
+        glDisable(GL_LIGHT0)
+        glDisable(GL_LIGHTING)
+
+        glPopMatrix()
+
+        # glPushMatrix()
+        # glTranslatef(self.position[0], self.position[1], self.position[2])
+        # glRotatef(self.angle, 0, 1, 0)
+        # glScaled(5, 5, 5)
+        # glColor3f(1.0, 1.0, 1.0)
 
         # Agregamos la texturas al cuerpo del Montacarga
         
-        # front face
-        glEnable(GL_TEXTURE_2D)
-        glBindTexture(GL_TEXTURE_2D, self.textures[2])
-        glBegin(GL_QUADS)
-        glTexCoord2f(0.0, 0.0)
-        glVertex3d(1, 1, 1)
-        glTexCoord2f(0.0, 1.0)
-        glVertex3d(1, 1, -1)
-        glTexCoord2f(1.0, 1.0)
-        glVertex3d(1, -1, -1)
-        glTexCoord2f(1.0, 0.0)
-        glVertex3d(1, -1, 1)
+        # # front face
+        # glEnable(GL_TEXTURE_2D)
+        # glBindTexture(GL_TEXTURE_2D, self.textures[2])
+        # glBegin(GL_QUADS)
+        # glTexCoord2f(0.0, 0.0)
+        # glVertex3d(1, 1, 1)
+        # glTexCoord2f(0.0, 1.0)
+        # glVertex3d(1, 1, -1)
+        # glTexCoord2f(1.0, 1.0)
+        # glVertex3d(1, -1, -1)
+        # glTexCoord2f(1.0, 0.0)
+        # glVertex3d(1, -1, 1)
 
-        # 2nd face
-        glTexCoord2f(0.0, 0.0)
-        glVertex3d(-2, 1, 1)
-        glTexCoord2f(0.0, 1.0)
-        glVertex3d(1, 1, 1)
-        glTexCoord2f(1.0, 1.0)
-        glVertex3d(1, -1, 1)
-        glTexCoord2f(1.0, 0.0)
-        glVertex3d(-2, -1, 1)
+        # # 2nd face
+        # glTexCoord2f(0.0, 0.0)
+        # glVertex3d(-2, 1, 1)
+        # glTexCoord2f(0.0, 1.0)
+        # glVertex3d(1, 1, 1)
+        # glTexCoord2f(1.0, 1.0)
+        # glVertex3d(1, -1, 1)
+        # glTexCoord2f(1.0, 0.0)
+        # glVertex3d(-2, -1, 1)
 
-        # 3rd face
-        glTexCoord2f(0.0, 0.0)
-        glVertex3d(-2, 1, -1)
-        glTexCoord2f(0.0, 1.0)
-        glVertex3d(-2, 1, 1)
-        glTexCoord2f(1.0, 1.0)
-        glVertex3d(-2, -1, 1)
-        glTexCoord2f(1.0, 0.0)
-        glVertex3d(-2, -1, -1)
+        # # 3rd face
+        # glTexCoord2f(0.0, 0.0)
+        # glVertex3d(-2, 1, -1)
+        # glTexCoord2f(0.0, 1.0)
+        # glVertex3d(-2, 1, 1)
+        # glTexCoord2f(1.0, 1.0)
+        # glVertex3d(-2, -1, 1)
+        # glTexCoord2f(1.0, 0.0)
+        # glVertex3d(-2, -1, -1)
 
-        # 4th face
-        glTexCoord2f(0.0, 0.0)
-        glVertex3d(1, 1, -1)
-        glTexCoord2f(0.0, 1.0)
-        glVertex3d(-2, 1, -1)
-        glTexCoord2f(1.0, 1.0)
-        glVertex3d(-2, -1, -1)
-        glTexCoord2f(1.0, 0.0)
-        glVertex3d(1, -1, -1)
+        # # 4th face
+        # glTexCoord2f(0.0, 0.0)
+        # glVertex3d(1, 1, -1)
+        # glTexCoord2f(0.0, 1.0)
+        # glVertex3d(-2, 1, -1)
+        # glTexCoord2f(1.0, 1.0)
+        # glVertex3d(-2, -1, -1)
+        # glTexCoord2f(1.0, 0.0)
+        # glVertex3d(1, -1, -1)
 
-        # top
-        glTexCoord2f(0.0, 0.0)
-        glVertex3d(1, 1, 1)
-        glTexCoord2f(0.0, 1.0)
-        glVertex3d(-2, 1, 1)
-        glTexCoord2f(1.0, 1.0)
-        glVertex3d(-2, 1, -1)
-        glTexCoord2f(1.0, 0.0)
-        glVertex3d(1, 1, -1)
-        glEnd()
+        # # top
+        # glTexCoord2f(0.0, 0.0)
+        # glVertex3d(1, 1, 1)
+        # glTexCoord2f(0.0, 1.0)
+        # glVertex3d(-2, 1, 1)
+        # glTexCoord2f(1.0, 1.0)
+        # glVertex3d(-2, 1, -1)
+        # glTexCoord2f(1.0, 0.0)
+        # glVertex3d(1, 1, -1)
+        # glEnd()
 
-        # Head
-        glPushMatrix()
-        glTranslatef(0, 1.5, 0)
-        glScaled(0.8, 0.8, 0.8)
-        glColor3f(1.0, 1.0, 1.0)
-        head = Cubo(self.textures, 0)
-        head.draw()
-        glPopMatrix()
-        glDisable(GL_TEXTURE_2D)
+        # # Head
+        # glPushMatrix()
+        # glTranslatef(0, 1.5, 0)
+        # glScaled(0.8, 0.8, 0.8)
+        # glColor3f(1.0, 1.0, 1.0)
+        # head = Cubo(self.textures, 0)
+        # head.draw()
+        # glPopMatrix()
+        # glDisable(GL_TEXTURE_2D)
 
-        # Wheels
-        glEnable(GL_TEXTURE_2D)
-        glBindTexture(GL_TEXTURE_2D, self.textures[1])
-        glPushMatrix()
-        glTranslatef(-1.2, -1, 1)
-        glScaled(0.3, 0.3, 0.3)
-        glColor3f(1.0, 1.0, 1.0)
-        wheel = Cubo(self.textures, 0)
-        wheel.draw()
-        glPopMatrix()
+        # # Wheels
+        # glEnable(GL_TEXTURE_2D)
+        # glBindTexture(GL_TEXTURE_2D, self.textures[1])
+        # glPushMatrix()
+        # glTranslatef(-1.2, -1, 1)
+        # glScaled(0.3, 0.3, 0.3)
+        # glColor3f(1.0, 1.0, 1.0)
+        # wheel = Cubo(self.textures, 0)
+        # wheel.draw()
+        # glPopMatrix()
 
-        glPushMatrix()
-        glTranslatef(0.5, -1, 1)
-        glScaled(0.3, 0.3, 0.3)
-        wheel = Cubo(self.textures, 0)
-        wheel.draw()
-        glPopMatrix()
+        # glPushMatrix()
+        # glTranslatef(0.5, -1, 1)
+        # glScaled(0.3, 0.3, 0.3)
+        # wheel = Cubo(self.textures, 0)
+        # wheel.draw()
+        # glPopMatrix()
 
-        glPushMatrix()
-        glTranslatef(0.5, -1, -1)
-        glScaled(0.3, 0.3, 0.3)
-        wheel = Cubo(self.textures, 0)
-        wheel.draw()
-        glPopMatrix()
+        # glPushMatrix()
+        # glTranslatef(0.5, -1, -1)
+        # glScaled(0.3, 0.3, 0.3)
+        # wheel = Cubo(self.textures, 0)
+        # wheel.draw()
+        # glPopMatrix()
 
-        glPushMatrix()
-        glTranslatef(-1.2, -1, -1)
-        glScaled(0.3, 0.3, 0.3)
-        wheel = Cubo(self.textures, 0)
-        wheel.draw()
-        glPopMatrix()
-        glDisable(GL_TEXTURE_2D)
+        # glPushMatrix()
+        # glTranslatef(-1.2, -1, -1)
+        # glScaled(0.3, 0.3, 0.3)
+        # wheel = Cubo(self.textures, 0)
+        # wheel.draw()
+        # glPopMatrix()
+        # glDisable(GL_TEXTURE_2D)
 
         # Lifter
-        glPushMatrix()
-        if self.status == 1 or self.status == 2 or self.status == 3:
-            self.drawTrash()
-        glColor3f(0.0, 0.0, 0.0)
-        glTranslatef(0, self.platformHeight, 0)  # Up and down
-        glBegin(GL_QUADS)
-        glTexCoord2f(0.0, 0.0)
-        glVertex3d(1, 1, 1)
-        glTexCoord2f(0.0, 1.0)
-        glVertex3d(1, 1, -1)
-        glTexCoord2f(1.0, 1.0)
-        glVertex3d(3, 1, -1)
-        glTexCoord2f(1.0, 0.0)
-        glVertex3d(3, 1, 1)
-        glEnd()
-        glPopMatrix()
-        glPopMatrix()
+        # glPushMatrix()
+        # if self.status == 1 or self.status == 2 or self.status == 3:
+        #     self.drawTrash()
+        # glColor3f(0.0, 0.0, 0.0)
+        # glTranslatef(0, self.platformHeight, 0)  # Up and down
+        # glBegin(GL_QUADS)
+        # glTexCoord2f(0.0, 0.0)
+        # glVertex3d(1, 1, 1)
+        # glTexCoord2f(0.0, 1.0)
+        # glVertex3d(1, 1, -1)
+        # glTexCoord2f(1.0, 1.0)
+        # glVertex3d(3, 1, -1)
+        # glTexCoord2f(1.0, 0.0)
+        # glVertex3d(3, 1, 1)
+        # glEnd()
+        # glPopMatrix()
+        # glPopMatrix()
 
     def drawTrash(self):
         glPushMatrix()

@@ -4,6 +4,8 @@ from datetime import datetime
 import asyncio
 import aiohttp
 
+import pywavefront
+
 import pygame
 from pygame.locals import *
 
@@ -13,7 +15,7 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
 # Cambiamos el directorio de trabajo
-# os.chdir(os.path.join(os.getcwd(), "OpenGL")) # chdir: Se utiliza para cambiar el directorio de trabajo actual a la ruta especificada
+os.chdir(os.path.join(os.getcwd(), "OpenGL")) # chdir: Se utiliza para cambiar el directorio de trabajo actual a la ruta especificada
 
 from math import *
 from random import *
@@ -25,12 +27,12 @@ URL_BASE = "http://localhost:8000"
 response = requests.post(URL_BASE + "/simulations", allow_redirects = False)
 data = response.json()
 LOCATION = data["Location"] # ID de la simulación
-print("Datos:", data)
-print("Ubicación:", LOCATION)
+# print("Datos:", data)
+# print("Ubicación:", LOCATION)
 
 # Obtener la dimensión del contenedor
-print("Tamaño del contenedor:", data["container_corners"])
-info_cajas = []
+# print("Tamaño del contenedor:", data["container_corners"])
+cajas = []
 
 # Atributos de la caja
 # [{'id': 2, 'pos': [15, 0, 20], 'is_stacked': True, 'WHD': [20, 20, 20], 'final_pos': [15, 0, 20]}, {'id': 1, 'pos': [15, 0, 0], 'is_stacked': True, 'WHD': [20, 50, 20], 'final_pos': [15, 0, 0]}]
@@ -42,9 +44,9 @@ async def asynchronous_call():
         for _ in range(100):
             async with session.get(URL_BASE + LOCATION) as response:
                 response = await response.json()
+                # Agregamos la información de las cajas
                 box = response["boxes"]
-                print(box)
-                info_cajas.append(box)
+                cajas.append(box)
                 
     end_time = datetime.now()
     print("Tiempo de ejecución:", end_time - start_time)
@@ -62,9 +64,9 @@ ZFAR=1800.0
 EYE_X=300.0
 EYE_Y=200.0
 EYE_Z=300.0
-CENTER_X=0
-CENTER_Y=0
-CENTER_Z=0
+CENTER_X=0.0
+CENTER_Y=0.0
+CENTER_Z=0.0
 UP_X=0
 UP_Y=1
 UP_Z=0
@@ -83,7 +85,7 @@ DimBoard = 200
 montacargas = []
 nMontacargas = 5
 
-cajas = []
+cajas_class = []
 
 # Variables para el control del observador
 theta = 0.0
@@ -91,25 +93,27 @@ radius = 300
 
 # Arreglo para el manejo de texturas
 textures = []
-# filenames = ["./img1.bmp", "./wheel.jpeg", "./walle.jpeg", "./basura.bmp"]
 filenames_objects = ["./textures/acero_negro.png", "./textures/llanta.png", "./textures/acero_amarillo.png", "./textures/caja.png", "./textures/piso_almacen.png"]
+
+# Cargamos los puntos del archivo .obj del Montacarga
+montacarga_obj = pywavefront.Wavefront('./models_3D/montacarga.obj', create_materials=True, collect_faces=True)
 
 def Axis():
     glShadeModel(GL_FLAT)
     glLineWidth(3.0)
-    #X axis in red
+    # X axis in red
     glColor3f(1.0,0.0,0.0)
     glBegin(GL_LINES)
     glVertex3f(X_MIN,0.0,0.0)
     glVertex3f(X_MAX,0.0,0.0)
     glEnd()
-    #Y axis in green
+    # Y axis in green
     glColor3f(0.0,1.0,0.0)
     glBegin(GL_LINES)
     glVertex3f(0.0,Y_MIN,0.0)
     glVertex3f(0.0,Y_MAX,0.0)
     glEnd()
-    #Z axis in blue
+    # Z axis in blue
     glColor3f(0.0,0.0,1.0)
     glBegin(GL_LINES)
     glVertex3f(0.0,0.0,Z_MIN)
@@ -151,10 +155,10 @@ def Init():
         Texturas(i)
     
     for i in range(nMontacargas):
-        montacargas.append(Montacarga(DimBoard, 0.7, textures))
+        montacargas.append(Montacarga(DimBoard, 0.7, montacarga_obj, textures))
         
-    for i in range(len(info_cajas[0])):
-        cajas.append(Caja(DimBoard, 1, textures, 3, info_cajas[0][i]["pos"], info_cajas[0][i]["WHD"]))
+    for i in range(len(cajas[0])):
+        cajas_class.append(Caja(DimBoard, 1, textures, 3, cajas[0][i]["pos"], cajas[0][i]["WHD"]))
 
 def checkCollisions():
     for c in montacargas:
@@ -207,55 +211,62 @@ def display():
 
     checkCollisions()
 
-# Cambio de la posición del observador
+# Manipulación de la posición del observador
+speed_movement = 1.0
 def handleMovement(keys):
-    global EYE_X, EYE_Y, EYE_Z, CENTER_X, CENTER_Y, CENTER_Z, theta
-    
+    global EYE_X, EYE_Y, EYE_Z
+    global CENTER_X, CENTER_Y, CENTER_Z
+    global theta
+
+    # Calcular el vector de dirección a partir de theta
+    r = radians(theta)
+    dir_x = cos(r)
+    dir_z = sin(r)
+
+    # Movimiento hacia adelante y hacia atrás (W y S)
     if keys[pygame.K_w]:
-        EYE_X -= cos(theta) + sin(theta) 
-        EYE_Z -= sin(theta) + cos(theta)
-        CENTER_X -= cos(theta) + sin(theta)
-        CENTER_Z -= sin(theta) + cos(theta)
-
+        EYE_X += dir_x * speed_movement
+        EYE_Z += dir_z * speed_movement
     if keys[pygame.K_s]:
-        EYE_X += sin(theta) + cos(theta) 
-        EYE_Z += cos(theta) + sin(theta)
-        CENTER_X += sin(theta) + cos(theta)
-        CENTER_Z += cos(theta) + sin(theta)
+        EYE_X -= dir_x * speed_movement
+        EYE_Z -= dir_z * speed_movement
 
+    # Movimiento lateral (A y D)
     if keys[pygame.K_a]:
-        EYE_X -= cos(theta) - sin(theta)
-        EYE_Z += sin(theta) + cos(theta)
-        CENTER_X -= cos(theta) - sin(theta)
-        CENTER_Z += sin(theta) + cos(theta)
+        EYE_X += dir_z * speed_movement
+        EYE_Z -= dir_x * speed_movement
 
     if keys[pygame.K_d]:
-        EYE_X += cos(theta) - sin(theta)
-        EYE_Z -= sin(theta) + cos(theta)
-        CENTER_X += cos(theta) - sin(theta)
-        CENTER_Z -= sin(theta) + cos(theta)
+        EYE_X -= dir_z * speed_movement
+        EYE_Z += dir_x * speed_movement
+        
 
-    # Movimiento vertical
+    # Movimiento vertical (Flechas arriba y abajo)
     if keys[pygame.K_UP]:
         if EYE_Y < 500:
-            EYE_Y += 1.0
+            EYE_Y += speed_movement
 
     if keys[pygame.K_DOWN]:
         if EYE_Y > 0:
-            EYE_Y -= 1.0
+            EYE_Y -= speed_movement
 
-    # Rotación
-    # if keys[pygame.K_LEFT]:
-    #     theta += 1.0
-    #     r = radians(theta)
-    #     CENTER_X = EYE_X + cos(r)
-    #     CENTER_Z = EYE_Z + sin(r)
-    
-    # if keys[pygame.K_RIGHT]:
-    #     theta -= 1.0
-    #     r = radians(theta)
-    #     CENTER_X = EYE_X + cos(r)
-    #     CENTER_Z = EYE_Z + sin(r)
+    # Rotación izquierda y derecha (Flechas izquierda y derecha)
+    if keys[pygame.K_LEFT]:
+        theta -= speed_movement  # Rotar a la izquierda
+    if keys[pygame.K_RIGHT]:
+        theta += speed_movement  # Rotar a la derecha
+
+    # Mantener theta en el rango [0, 360)
+    theta %= 360
+
+    # Actualizar el punto de vista (CENTER_X, CENTER_Y, CENTER_Z)
+    r = radians(theta)
+    dir_x = cos(r)
+    dir_z = sin(r)
+
+    CENTER_X = EYE_X + dir_x
+    CENTER_Y = EYE_Y  # Mantener la misma altura
+    CENTER_Z = EYE_Z + dir_z
 
 Init()
 
