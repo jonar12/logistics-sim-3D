@@ -1,269 +1,171 @@
-import React, { useState, useEffect } from 'react';
-import { Canvas } from '@react-three/fiber';
-import { OrbitControls, Line } from '@react-three/drei';
-import axios from 'axios';
 import {
-	Button,
-	Card,
-	Heading,
-	Flex,
-	View,
-	Text,
-	Badge,
-	Loader,
-} from '@aws-amplify/ui-react';
-import '@aws-amplify/ui-react/styles.css';
+  Badge,
+  Button,
+  Card,
+  Flex,
+  Heading,
+  Loader,
+  Text,
+  View,
+} from "@aws-amplify/ui-react";
+import "@aws-amplify/ui-react/styles.css";
+import { Canvas } from "@react-three/fiber";
+import axios from "axios";
+import { useEffect, useState } from "react";
+import Scene from "./components/Scene";
 
 const api = axios.create({
-	baseURL: 'http://localhost:8000',
-	withCredentials: false,
-	headers: {
-		'Content-Type': 'application/json',
-	},
+  baseURL: "http://localhost:8000",
+  withCredentials: false,
+  headers: {
+    "Content-Type": "application/json",
+  },
 });
-
-const Container = ({ width, height, depth }) => {
-	// Calculate center position assuming the container starts at (0, 0, 0)
-	const centerX = width / 2;
-	const centerY = height / 2;
-	const centerZ = depth / 2;
-
-	return (
-		<mesh position={[centerX, centerY, centerZ]}>
-			<boxGeometry args={[width, height, depth]} />
-			<meshStandardMaterial color="yellow" transparent opacity={0.3} />
-		</mesh>
-	);
-};
-
-// Main scene component
-const Scene = ({ boxes, container }) => {
-	return (
-		<>
-			<ambientLight intensity={0.5} />
-			<pointLight position={[10, 10, 10]} />
-			<gridHelper args={[200, 200]} />
-
-			{/* Render the axes */}
-			<Axes />
-
-			{/* Render the container */}
-			{container && (
-				<Container
-					width={container.width}
-					height={container.height}
-					depth={container.depth}
-				/>
-			)}
-
-			{/* Render the boxes */}
-			{boxes.map((box, index) => (
-				<Box
-					key={index}
-					position={[box.pos[0], box.pos[1], box.pos[2]]}
-					dimensions={[box.WHD[0], box.WHD[1], box.WHD[2]]}
-					color={box.color}
-				/>
-			))}
-
-			<OrbitControls />
-		</>
-	);
-};
-
-// Box component to render individual boxes
-// Box component to render individual boxes
-const Box = ({ position, dimensions, color = '#1e40af' }) => {
-	// Calculate the center position
-	const centerX = position[0] + dimensions[0] / 2; // Corner X + half width
-	const centerY = position[1] + dimensions[1] / 2; // Corner Y + half height
-	const centerZ = position[2] + dimensions[2] / 2; // Corner Z + half depth
-
-	return (
-		<mesh position={[centerX, centerY, centerZ]}>
-			<boxGeometry args={dimensions} />
-			<meshStandardMaterial color={color} />
-		</mesh>
-	);
-};
 
 // Main component
 const BoxVisualization = () => {
-	const [simulationId, setSimulationId] = useState(null);
-	const [boxes, setBoxes] = useState([]);
-	const [container, setContainer] = useState(null);
-	const [step, setStep] = useState(0);
-	const [loading, setLoading] = useState(false);
-	const [error, setError] = useState(null);
-	const [isRunning, setIsRunning] = useState(false);
+  const [simulationId, setSimulationId] = useState(null);
+  const [boxes, setBoxes] = useState([]);
+  const [lifts, setLifts] = useState([]);
+  const [container, setContainer] = useState(null);
+  const [step, setStep] = useState(0);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState(null);
+  const [isRunning, setIsRunning] = useState(false);
 
-	// Initialize simulation
-	const initializeSimulation = async () => {
-		try {
-			setLoading(true);
-			setError(null);
+  // Initialize simulation
+  const initializeSimulation = async () => {
+    try {
+      setLoading(true);
+      setError(null);
 
-			const { data } = await api.post('/simulations');
-			const id = data.Location.split('/').pop();
-			setSimulationId(id);
+      const { data } = await api.post("/simulations");
+      const id = data.Location.split("/").pop();
+      setSimulationId(id);
 
-			// Set container corners from the API response
-			setContainer(data.container);
-			console.log('Container data: ', data.container);
-		} catch (error) {
-			let errorMessage = 'Failed to initialize simulation';
-			if (error.response) {
-				errorMessage = `Server error: ${error.response.status}`;
-			} else if (error.request) {
-				errorMessage = 'No response from server';
-			} else {
-				errorMessage = error.message;
-			}
-			setError(errorMessage);
-			console.error('Error details:', error);
-		} finally {
-			setLoading(false);
-		}
-	};
+      // Set container corners from the API response
+      setContainer(data.container);
+      // Set lift data from the API response
+      setLifts(data.lifts);
+      console.log("Container data: ", data.container);
+    } catch (error) {
+      let errorMessage = "Failed to initialize simulation";
+      if (error.response) {
+        errorMessage = `Server error: ${error.response.status}`;
+      } else if (error.request) {
+        errorMessage = "No response from server";
+      } else {
+        errorMessage = error.message;
+      }
+      setError(errorMessage);
+      console.error("Error details:", error);
+    } finally {
+      setLoading(false);
+    }
+  };
 
-	// Step simulation
-	const stepSimulation = async () => {
-		if (!simulationId) return;
+  // Step simulation
+  const stepSimulation = async () => {
+    if (!simulationId) return;
 
-		try {
-			setError(null);
+    try {
+      setError(null);
 
-			const { data } = await api.get(`/simulations/${simulationId}`);
-			// Imprime los datos completos obtenidos de la API
-			console.log('Datos obtenidos de la API:', data);
-			setBoxes(data.boxes);
-			setStep(data.step);
-			// Imprime información específica para validar contenido
-			console.log('Cajas:', data.boxes);
-			console.log('Paso actual:', data.step);
-		} catch (error) {
-			let errorMessage = 'Failed to step simulation';
-			if (error.response) {
-				errorMessage = `Server error: ${error.response.status}`;
-			} else if (error.request) {
-				errorMessage = 'No response from server';
-			} else {
-				errorMessage = error.message;
-			}
-			setError(errorMessage);
-			console.error('Error details:', error);
-		}
-	};
+      const { data } = await api.get(`/simulations/${simulationId}`);
+      // Set boxes data from the API response
+      setBoxes(data.boxes);
+      // Set lift data from the API response
+      setLifts(data.lifts);
 
-	// Handle continuous simulation
-	useEffect(() => {
-		let interval;
-		if (isRunning) {
-			interval = setInterval(() => {
-				stepSimulation();
-			}, 100);
-		}
-		return () => clearInterval(interval);
-	}, [isRunning, simulationId]);
+      setStep(data.step);
+    } catch (error) {
+      let errorMessage = "Failed to step simulation";
+      if (error.response) {
+        errorMessage = `Server error: ${error.response.status}`;
+      } else if (error.request) {
+        errorMessage = "No response from server";
+      } else {
+        errorMessage = error.message;
+      }
+      setError(errorMessage);
+      console.error("Error details:", error);
+    }
+  };
 
-	return (
-		<Card padding="large" variation="elevated">
-			<Flex direction="column" gap="medium">
-				<Heading level={3}>3D Box Visualization</Heading>
+  // Handle continuous simulation
+  useEffect(() => {
+    let interval;
+    if (isRunning) {
+      interval = setInterval(() => {
+        stepSimulation();
+      }, 100);
+    }
+    return () => clearInterval(interval);
+  }, [isRunning, simulationId]);
 
-				<Flex direction="row" gap="small" alignItems="center">
-					<Button
-						onClick={initializeSimulation}
-						isDisabled={loading || simulationId !== null}
-						variation="primary"
-					>
-						Initialize Simulation
-					</Button>
+  return (
+    <Card padding="large" variation="elevated">
+      <Flex direction="column" gap="medium">
+        <Heading level={3}>3D Box Visualization</Heading>
 
-					<Button
-						onClick={() => setIsRunning(!isRunning)}
-						isDisabled={simulationId === null}
-						variation="primary"
-					>
-						{isRunning ? 'Pause Simulation' : 'Start Simulation'}
-					</Button>
+        <Flex direction="row" gap="small" alignItems="center">
+          <Button
+            onClick={initializeSimulation}
+            isDisabled={loading || simulationId !== null}
+            variation="primary"
+          >
+            Initialize Simulation
+          </Button>
 
-					{loading && <Loader size="small" />}
-				</Flex>
+          <Button
+            onClick={() => setIsRunning(!isRunning)}
+            isDisabled={simulationId === null}
+            variation="primary"
+          >
+            {isRunning ? "Pause Simulation" : "Start Simulation"}
+          </Button>
 
-				{error && (
-					<View padding="small" backgroundColor="error.10">
-						<Text color="error.80">{error}</Text>
-					</View>
-				)}
+          {loading && <Loader size="small" />}
+        </Flex>
 
-				<View
-					height="600px"
-					borderRadius="medium"
-					backgroundColor="background.secondary"
-				>
-					<Canvas camera={{ position: [50, 50, 50] }}>
-						<Scene boxes={boxes} container={container} />
-					</Canvas>
-				</View>
+        {error && (
+          <View padding="small" backgroundColor="error.10">
+            <Text color="error.80">{error}</Text>
+          </View>
+        )}
 
-				<Flex direction="row" gap="small" alignItems="center">
-					<Text>Current Step:</Text>
-					<Badge variation="info">{step}</Badge>
-					{simulationId && (
-						<Text fontSize="small" color="font.tertiary">
-							Simulation ID: {simulationId}
-						</Text>
-					)}
-				</Flex>
+        <View
+          height="600px"
+          borderRadius="medium"
+          backgroundColor="background.secondary"
+        >
+          <Canvas camera={{ position: [50, 50, 50] }}>
+            <Scene boxes={boxes} lifts={lifts} container={container} />
+          </Canvas>
+        </View>
 
-				<Flex direction="column" gap="small">
-					<Text fontSize="small" color="font.secondary">
-						Statistics:
-					</Text>
-					<Text fontSize="small">Total Boxes: {boxes.length}</Text>
-					<Text fontSize="small">
-						Stacked Boxes: {boxes.filter(box => box.is_stacked).length}
-					</Text>
-				</Flex>
-			</Flex>
-		</Card>
-	);
+        <Flex direction="row" gap="small" alignItems="center">
+          <Text>Current Step:</Text>
+          <Badge variation="info">{step}</Badge>
+          {simulationId && (
+            <Text fontSize="small" color="font.tertiary">
+              Simulation ID: {simulationId}
+            </Text>
+          )}
+        </Flex>
+
+        <Flex direction="column" gap="small">
+          <Text fontSize="small" color="font.secondary">
+            Statistics:
+          </Text>
+          <Text fontSize="small">Total Boxes: {boxes.length}</Text>
+          <Text fontSize="small">
+            Stacked Boxes: {boxes.filter((box) => box.is_stacked).length}
+          </Text>
+        </Flex>
+      </Flex>
+    </Card>
+  );
 };
 
 export default BoxVisualization;
-
-// Axes component to render x, y, and z axes
-const Axes = () => {
-	return (
-		<>
-			{/* X-axis (red) */}
-			<Line
-				points={[
-					[0, 0, 0], // Origin
-					[100, 0, 0], // X-axis end
-				]}
-				color="red"
-				lineWidth={2}
-			/>
-			{/* Y-axis (green) */}
-			<Line
-				points={[
-					[0, 0, 0], // Origin
-					[0, 100, 0], // Y-axis end
-				]}
-				color="green"
-				lineWidth={2}
-			/>
-			{/* Z-axis (blue) */}
-			<Line
-				points={[
-					[0, 0, 0], // Origin
-					[0, 0, 100], // Z-axis end
-				]}
-				color="blue"
-				lineWidth={2}
-			/>
-		</>
-	);
-};
