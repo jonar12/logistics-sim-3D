@@ -10,10 +10,11 @@ import random
 import math
 
 class Montacarga:
-    def __init__(self, dim, vel, obj, textures):
-        self.textures = textures
+    def __init__(self, dim, vel, pos, obj, materiales):
+        self.materiales = materiales
         self.dim = dim
-        self.position = [0, 0, 0]
+        self.position = [pos[0], 18.5, pos[2]]
+        # self.position = [pos[0], 0, pos[2]]
         dirX = random.randint(-10, 10) or 1
         dirZ = random.randint(-1, 1) or 1
         magnitude = math.sqrt(dirX**2 + dirZ**2)
@@ -27,6 +28,7 @@ class Montacarga:
         self.radiusCol = 5
         self.status = 0
         self.trashID = -1
+        self.display_list = self.create_display_list()
 
     def search(self):
         # Change direction to random
@@ -42,98 +44,106 @@ class Montacarga:
         magnitude = math.sqrt(dirX**2 + dirZ**2)
         self.Direction = [(dirX / magnitude), 0, (dirZ / magnitude)]
 
-    # def update(self):
-    #     if self.status == 1:
-    #         delta = 0.01
-    #         if self.platformHeight >= 0:
-    #             self.targetCenter()
-    #             self.status = 2
-    #         else:
-    #             self.platformHeight += delta
-    #     elif self.status == 2:
-    #         if (self.position[0] <= 10 and self.position[0] >= -10) and (self.position[2] <= 10 and self.position[2] >= -10):
-    #             self.status = 3
-    #         else:
-    #             newX = self.position[0] + self.Direction[0] * self.vel
-    #             newZ = self.position[2] + self.Direction[2] * self.vel
-    #             if newX - 10 < -self.dim or newX + 10 > self.dim:
-    #                 self.Direction[0] *= -1
-    #             else:
-    #                 self.position[0] = newX
-    #             if newZ - 10 < -self.dim or newZ + 10 > self.dim:
-    #                 self.Direction[2] *= -1
-    #             else:
-    #                 self.position[2] = newZ
-    #             self.angle = math.acos(self.Direction[0]) * 180 / math.pi
-    #             if self.Direction[2] > 0:
-    #                 self.angle = 360 - self.angle
-    #     elif self.status == 3:
-    #         delta = 0.01
-    #         if self.platformHeight <= -1.5:
-    #             self.status = 4
-    #         else:
-    #             self.platformHeight -= delta
-    #     elif self.status == 4:
-    #         if (self.position[0] <= 20 and self.position[0] >= -20) and (self.position[2] <= 20 and self.position[2] >= -20):
-    #             self.position[0] -= (self.Direction[0] * (self.vel/4))
-    #             self.position[2] -= (self.Direction[2] * (self.vel/4))
-    #         else:
-    #             self.search()
-    #             self.status = 0
-    #     else:
-    #         # Update position
-    #         if random.randint(1,1000) == 69:
-    #             self.search()
-    #         newX = self.position[0] + self.Direction[0] * self.vel
-    #         newZ = self.position[2] + self.Direction[2] * self.vel
-    #         if newX - 10 < -self.dim or newX + 10 > self.dim:
-    #             self.Direction[0] *= -1
-    #         else:
-    #             self.position[0] = newX
-    #         if newZ - 10 < -self.dim or newZ + 10 > self.dim:
-    #             self.Direction[2] *= -1
-    #         else:
-    #             self.position[2] = newZ
-    #         self.angle = math.acos(self.Direction[0]) * 180 / math.pi
-    #         if self.Direction[2] > 0:
-    #             self.angle = 360 - self.angle
+    def update(self):
+        if self.status == 1:
+            delta = 0.01
+            if self.platformHeight >= 0:
+                self.targetCenter()
+                self.status = 2
+            else:
+                self.platformHeight += delta
+        elif self.status == 2:
+            if (self.position[0] <= 10 and self.position[0] >= -10) and (self.position[2] <= 10 and self.position[2] >= -10):
+                self.status = 3
+            else:
+                newX = self.position[0] + self.Direction[0] * self.vel
+                newZ = self.position[2] + self.Direction[2] * self.vel
+                if newX - 10 < -self.dim or newX + 10 > self.dim:
+                    self.Direction[0] *= -1
+                else:
+                    self.position[0] = newX
+                if newZ - 10 < -self.dim or newZ + 10 > self.dim:
+                    self.Direction[2] *= -1
+                else:
+                    self.position[2] = newZ
+                self.angle = math.acos(self.Direction[0]) * 180 / math.pi
+                if self.Direction[2] > 0:
+                    self.angle = 360 - self.angle
+        elif self.status == 3:
+            delta = 0.01
+            if self.platformHeight <= -1.5:
+                self.status = 4
+            else:
+                self.platformHeight -= delta
+        elif self.status == 4:
+            if (self.position[0] <= 20 and self.position[0] >= -20) and (self.position[2] <= 20 and self.position[2] >= -20):
+                self.position[0] -= (self.Direction[0] * (self.vel/4))
+                self.position[2] -= (self.Direction[2] * (self.vel/4))
+            else:
+                self.search()
+                self.status = 0
+        else:
+            # Update position
+            if random.randint(1,1000) == 69:
+                self.search()
+            newX = self.position[0] + self.Direction[0] * self.vel
+            newZ = self.position[2] + self.Direction[2] * self.vel
+            if newX - 10 < -self.dim or newX + 10 > self.dim:
+                self.Direction[0] *= -1
+            else:
+                self.position[0] = newX
+            if newZ - 10 < -self.dim or newZ + 10 > self.dim:
+                self.Direction[2] *= -1
+            else:
+                self.position[2] = newZ
+            self.angle = math.acos(self.Direction[0]) * 180 / math.pi
+            if self.Direction[2] > 0:
+                self.angle = 360 - self.angle
 
-    #         # Move platform
-    #         delta = 0.01
-    #         if self.platformUp:
-    #             if self.platformHeight >= 0:
-    #                 self.platformUp = False
-    #             else:
-    #                 self.platformHeight += delta
-    #         elif self.platformDown:
-    #             if self.platformHeight <= -1.5:
-    #                 self.platformUp = True
-    #             else:
-    #                 self.platformHeight -= delta
+            # Move platform
+            delta = 0.01
+            if self.platformUp:
+                if self.platformHeight >= 0:
+                    self.platformUp = False
+                else:
+                    self.platformHeight += delta
+            elif self.platformDown:
+                if self.platformHeight <= -1.5:
+                    self.platformUp = True
+                else:
+                    self.platformHeight -= delta
+
+    def create_display_list(self):
+        display_list = glGenLists(1)
+        glNewList(display_list, GL_COMPILE)
+
+        # Dibujar el Montacarga
+        for _, mesh in self.scene.meshes.items():
+            for i, face in enumerate(mesh.faces):
+                material_obj = mesh.materials[i % len(mesh.materials)]
+                material_name = material_obj.name
+                color_diffuso = self.materiales.get(material_name, {}).get('Kd', [1.0, 1.0, 1.0])
+                glColor3f(*color_diffuso)
+
+                glBegin(GL_TRIANGLES)
+                for vertex_i in face:
+                    vertex = self.scene.vertices[vertex_i]
+                    glVertex3f(*vertex)
+                glEnd()
+        glEndList()
+        return display_list
 
     def draw(self):
         glPushMatrix()
         glTranslatef(self.position[0], self.position[1], self.position[2])
         glRotatef(self.angle, 0.0, 1.0, 0.0)
-        glScaled(0.03, 0.03, 0.03)
-        glEnable(GL_LIGHTING)
-        glEnable(GL_LIGHT0)
-        glEnable(GL_COLOR_MATERIAL)
-        glColorMaterial(GL_FRONT_AND_BACK, GL_AMBIENT_AND_DIFFUSE)
-        glColor3f(1.0, 1.0, 1.0)
-
-        # Dibujar el Montacarga
-        for _, mesh in self.scene.meshes.items():
-            glBegin(GL_TRIANGLES)
-            for face in mesh.faces:
-                for vertex_i in face:
-                    vertex = self.scene.vertices[vertex_i]
-                    glVertex3f(*vertex)
-            glEnd()
-
-        glDisable(GL_COLOR_MATERIAL)
-        glDisable(GL_LIGHT0)
+        glScaled(0.085, 0.085, 0.085)
+        
         glDisable(GL_LIGHTING)
+        glDisable(GL_COLOR_MATERIAL)
+
+        # Dibujar el Montacarga usando la lista de visualización
+        glCallList(self.display_list)
 
         glPopMatrix()
 
@@ -261,77 +271,77 @@ class Montacarga:
         # glPopMatrix()
         # glPopMatrix()
 
-    def drawTrash(self):
-        glPushMatrix()
-        glTranslatef(2, (self.platformHeight + 1.5), 0)
-        glScaled(0.5, 0.5, 0.5)
-        glColor3f(1.0, 1.0, 1.0)
+    # def drawTrash(self):
+    #     glPushMatrix()
+    #     glTranslatef(2, (self.platformHeight + 1.5), 0)
+    #     glScaled(0.5, 0.5, 0.5)
+    #     glColor3f(1.0, 1.0, 1.0)
 
-        glEnable(GL_TEXTURE_2D)
-        glBindTexture(GL_TEXTURE_2D, self.textures[3])
-        glBegin(GL_QUADS)
+    #     glEnable(GL_TEXTURE_2D)
+    #     glBindTexture(GL_TEXTURE_2D, self.textures[3])
+    #     glBegin(GL_QUADS)
 
-        # Front face
-        glTexCoord2f(0.0, 0.0)
-        glVertex3d(1, 1, 1)
-        glTexCoord2f(1.0, 0.0)
-        glVertex3d(-1, 1, 1)
-        glTexCoord2f(1.0, 1.0)
-        glVertex3d(-1, -1, 1)
-        glTexCoord2f(0.0, 1.0)
-        glVertex3d(1, -1, 1)
+    #     # Front face
+    #     glTexCoord2f(0.0, 0.0)
+    #     glVertex3d(1, 1, 1)
+    #     glTexCoord2f(1.0, 0.0)
+    #     glVertex3d(-1, 1, 1)
+    #     glTexCoord2f(1.0, 1.0)
+    #     glVertex3d(-1, -1, 1)
+    #     glTexCoord2f(0.0, 1.0)
+    #     glVertex3d(1, -1, 1)
 
-        # Back face
-        glTexCoord2f(0.0, 0.0)
-        glVertex3d(-1, 1, -1)
-        glTexCoord2f(1.0, 0.0)
-        glVertex3d(1, 1, -1)
-        glTexCoord2f(1.0, 1.0)
-        glVertex3d(1, -1, -1)
-        glTexCoord2f(0.0, 1.0)
-        glVertex3d(-1, -1, -1)
+    #     # Back face
+    #     glTexCoord2f(0.0, 0.0)
+    #     glVertex3d(-1, 1, -1)
+    #     glTexCoord2f(1.0, 0.0)
+    #     glVertex3d(1, 1, -1)
+    #     glTexCoord2f(1.0, 1.0)
+    #     glVertex3d(1, -1, -1)
+    #     glTexCoord2f(0.0, 1.0)
+    #     glVertex3d(-1, -1, -1)
 
-        # Left face
-        glTexCoord2f(0.0, 0.0)
-        glVertex3d(-1, 1, 1)
-        glTexCoord2f(1.0, 0.0)
-        glVertex3d(-1, 1, -1)
-        glTexCoord2f(1.0, 1.0)
-        glVertex3d(-1, -1, -1)
-        glTexCoord2f(0.0, 1.0)
-        glVertex3d(-1, -1, 1)
+    #     # Left face
+    #     glTexCoord2f(0.0, 0.0)
+    #     glVertex3d(-1, 1, 1)
+    #     glTexCoord2f(1.0, 0.0)
+    #     glVertex3d(-1, 1, -1)
+    #     glTexCoord2f(1.0, 1.0)
+    #     glVertex3d(-1, -1, -1)
+    #     glTexCoord2f(0.0, 1.0)
+    #     glVertex3d(-1, -1, 1)
 
-        # Right face
-        glTexCoord2f(0.0, 0.0)
-        glVertex3d(1, 1, -1)
-        glTexCoord2f(1.0, 0.0)
-        glVertex3d(1, 1, 1)
-        glTexCoord2f(1.0, 1.0)
-        glVertex3d(1, -1, 1)
-        glTexCoord2f(0.0, 1.0)
-        glVertex3d(1, -1, -1)
+    #     # Right face
+    #     glTexCoord2f(0.0, 0.0)
+    #     glVertex3d(1, 1, -1)
+    #     glTexCoord2f(1.0, 0.0)
+    #     glVertex3d(1, 1, 1)
+    #     glTexCoord2f(1.0, 1.0)
+    #     glVertex3d(1, -1, 1)
+    #     glTexCoord2f(0.0, 1.0)
+    #     glVertex3d(1, -1, -1)
 
-        # Top face
-        glTexCoord2f(0.0, 0.0)
-        glVertex3d(-1, 1, 1)
-        glTexCoord2f(1.0, 0.0)
-        glVertex3d(1, 1, 1)
-        glTexCoord2f(1.0, 1.0)
-        glVertex3d(1, 1, -1)
-        glTexCoord2f(0.0, 1.0)
-        glVertex3d(-1, 1, -1)
+    #     # Top face
+    #     glTexCoord2f(0.0, 0.0)
+    #     glVertex3d(-1, 1, 1)
+    #     glTexCoord2f(1.0, 0.0)
+    #     glVertex3d(1, 1, 1)
+    #     glTexCoord2f(1.0, 1.0)
+    #     glVertex3d(1, 1, -1)
+    #     glTexCoord2f(0.0, 1.0)
+    #     glVertex3d(-1, 1, -1)
 
-        # Bottom face
-        glTexCoord2f(0.0, 0.0)
-        glVertex3d(-1, -1, 1)
-        glTexCoord2f(1.0, 0.0)
-        glVertex3d(1, -1, 1)
-        glTexCoord2f(1.0, 1.0)
-        glVertex3d(1, -1, -1)
-        glTexCoord2f(0.0, 1.0)
-        glVertex3d(-1, -1, -1)
+    #     # Bottom face
+    #     glTexCoord2f(0.0, 0.0)
+    #     glVertex3d(-1, -1, 1)
+    #     glTexCoord2f(1.0, 0.0)
+    #     glVertex3d(1, -1, 1)
+    #     glTexCoord2f(1.0, 1.0)
+    #     glVertex3d(1, -1, -1)
+    #     glTexCoord2f(0.0, 1.0)
+    #     glVertex3d(-1, -1, -1)
 
-        glEnd()
-        glDisable(GL_TEXTURE_2D)
+    #     glEnd()
+    #     glDisable(GL_TEXTURE_2D)
 
-        glPopMatrix()
+    #     glPopMatrix()

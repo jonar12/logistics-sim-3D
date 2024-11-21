@@ -5,6 +5,7 @@ import asyncio
 import aiohttp
 
 import pywavefront
+from process_mtl import cargar_mtl
 
 import pygame
 from pygame.locals import *
@@ -15,12 +16,13 @@ from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
 # Cambiamos el directorio de trabajo
-os.chdir(os.path.join(os.getcwd(), "OpenGL")) # chdir: Se utiliza para cambiar el directorio de trabajo actual a la ruta especificada
+# os.chdir(os.path.join(os.getcwd(), "OpenGL")) # chdir: Se utiliza para cambiar el directorio de trabajo actual a la ruta especificada
 
 from math import *
 from random import *
 from Montacarga import Montacarga
 from Caja import Caja
+from PIL import ImageColor
 
 # Llamada a la API
 URL_BASE = "http://localhost:8000"
@@ -33,6 +35,7 @@ LOCATION = data["Location"] # ID de la simulación
 # Obtener la dimensión del contenedor
 # print("Tamaño del contenedor:", data["container_corners"])
 cajas = []
+montacargas = []
 
 # Atributos de la caja
 # [{'id': 2, 'pos': [15, 0, 20], 'is_stacked': True, 'WHD': [20, 20, 20], 'final_pos': [15, 0, 20]}, {'id': 1, 'pos': [15, 0, 0], 'is_stacked': True, 'WHD': [20, 50, 20], 'final_pos': [15, 0, 0]}]
@@ -44,15 +47,31 @@ async def asynchronous_call():
         for _ in range(100):
             async with session.get(URL_BASE + LOCATION) as response:
                 response = await response.json()
+
+                # Agregamos la información de los montacargas
+                montacarga = response["robots"]
+                print("Montacarga:", montacarga)
+
                 # Agregamos la información de las cajas
-                box = response["boxes"]
-                cajas.append(box)
-                
+                caja = response["boxes"]
+
+                # Procesamos los colores de las cajas
+                for i in range(len(caja)):
+                    color = caja[i]["color"]
+                    x, y, z = ImageColor.getcolor(color, "RGB")
+                    caja[i]["color"] = (x / 255, y / 255, z / 255)
+
+
+                montacargas.append(montacarga)
+                cajas.append(caja)
+
     end_time = datetime.now()
     print("Tiempo de ejecución:", end_time - start_time)
 
 asyncio.run(asynchronous_call())
 
+print("Cajas:", len(cajas[0]))
+print("Montacargas:", len(montacargas[0]))
 
 screen_width = 500
 screen_height = 500
@@ -81,10 +100,8 @@ Z_MAX=500
 # Dimension del plano
 DimBoard = 200
 
-# Arreglo para el manejo de los montacargas
-montacargas = []
-nMontacargas = 5
-
+# Arreglos para el manejo de los objetos
+montacargas_class = []
 cajas_class = []
 
 # Variables para el control del observador
@@ -96,7 +113,13 @@ textures = []
 filenames_objects = ["./textures/acero_negro.png", "./textures/llanta.png", "./textures/acero_amarillo.png", "./textures/caja.png", "./textures/piso_almacen.png"]
 
 # Cargamos los puntos del archivo .obj del Montacarga
-montacarga_obj = pywavefront.Wavefront('./models_3D/montacarga.obj', create_materials=True, collect_faces=True)
+montacarga_obj = pywavefront.Wavefront('./models_3D/Forklift.obj', create_materials=True, collect_faces=True)
+montacarga_mtl = './models_3D/Forklift.mtl'
+# montacarga_obj = pywavefront.Wavefront('./models_3D/ImageToStl.com_forklift2.obj', collect_faces=True, create_materials=True)
+# montacarga_mtl = './models_3D/forklift2.mtl'
+
+# Cargar materiales del archivo .mtl
+materiales = cargar_mtl(montacarga_mtl)
 
 def Axis():
     glShadeModel(GL_FLAT)
@@ -134,7 +157,7 @@ def Texturas(filepath):
     image_data = pygame.image.tostring(image, "RGBA")
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data)
     glGenerateMipmap(GL_TEXTURE_2D)
-    
+
 def Init():
     screen = pygame.display.set_mode(
         (screen_width, screen_height), DOUBLEBUF | OPENGL)
@@ -154,15 +177,15 @@ def Init():
     for i in filenames_objects:
         Texturas(i)
     
-    for i in range(nMontacargas):
-        montacargas.append(Montacarga(DimBoard, 0.7, montacarga_obj, textures))
+    for i in range(len(montacargas[0])):
+        montacargas_class.append(Montacarga(DimBoard, 0.7, montacargas[0][i]["pos"], montacarga_obj, materiales))
         
     for i in range(len(cajas[0])):
-        cajas_class.append(Caja(DimBoard, 1, textures, 3, cajas[0][i]["pos"], cajas[0][i]["WHD"]))
+        cajas_class.append(Caja(DimBoard, 1, textures, 3, cajas[0][i]["pos"], cajas[0][i]["WHD"], cajas[0][i]["color"]))
 
 def checkCollisions():
-    for c in montacargas:
-        for b in cajas:
+    for c in montacargas_class:
+        for b in cajas_class:
             distance = sqrt(pow((b.position[0] - c.position[0]), 2) + pow((b.position[2] - c.position[2]), 2))
             if distance <= c.radiusCol:
                 if c.status == 0 and b.alive:
@@ -173,7 +196,7 @@ def display():
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     # Se dibujan los montacargas   
-    for obj in montacargas:
+    for obj in montacargas_class:
         obj.draw()
         # obj.update()    
 
@@ -190,10 +213,11 @@ def display():
     glEnd()
     
     # Se dibujan las cajas
-    for obj in cajas:
+    for obj in cajas_class:
         obj.draw()
     
     # Se dibuja el piso del almacén
+    glColor3f(1.0, 1.0, 1.0)
     glEnable(GL_TEXTURE_2D)
     glBindTexture(GL_TEXTURE_2D, textures[4])
     glBegin(GL_QUADS)
@@ -267,7 +291,7 @@ def handleMovement(keys):
     CENTER_X = EYE_X + dir_x
     CENTER_Y = EYE_Y  # Mantener la misma altura
     CENTER_Z = EYE_Z + dir_z
-
+    
 Init()
 
 done = False
