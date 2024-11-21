@@ -22,6 +22,7 @@ from math import *
 from random import *
 from Montacarga import Montacarga
 from Caja import Caja
+from Camion import Camion
 from PIL import ImageColor
 
 # Llamada a la API
@@ -33,12 +34,19 @@ LOCATION = data["Location"] # ID de la simulación
 # print("Ubicación:", LOCATION)
 
 # Obtener la dimensión del contenedor
-# print("Tamaño del contenedor:", data["container_corners"])
+(xColor, yColor, zColor) = ImageColor.getcolor("#e4ff00", "RGB")
+container_color = (xColor / 255, yColor / 255, zColor / 255)
+
+# Obtener los datos del contenedor
+container = data["container"]
+
+# Obtener las dimensiones del contenedor
+depth = container["depth"]
+height = container["height"]
+width = container["width"]
+
 cajas = []
 montacargas = []
-
-# Atributos de la caja
-# [{'id': 2, 'pos': [15, 0, 20], 'is_stacked': True, 'WHD': [20, 20, 20], 'final_pos': [15, 0, 20]}, {'id': 1, 'pos': [15, 0, 0], 'is_stacked': True, 'WHD': [20, 50, 20], 'final_pos': [15, 0, 0]}]
 
 # Realizar las llamadas a la API asíncronamente	
 async def asynchronous_call():
@@ -49,8 +57,7 @@ async def asynchronous_call():
                 response = await response.json()
 
                 # Agregamos la información de los montacargas
-                montacarga = response["robots"]
-                print("Montacarga:", montacarga)
+                montacarga = response["lifts"]
 
                 # Agregamos la información de las cajas
                 caja = response["boxes"]
@@ -72,6 +79,8 @@ asyncio.run(asynchronous_call())
 
 print("Cajas:", len(cajas[0]))
 print("Montacargas:", len(montacargas[0]))
+
+print(montacargas[0])
 
 screen_width = 500
 screen_height = 500
@@ -101,6 +110,7 @@ Z_MAX=500
 DimBoard = 200
 
 # Arreglos para el manejo de los objetos
+contenedor_class = []
 montacargas_class = []
 cajas_class = []
 
@@ -183,6 +193,11 @@ def Init():
     for i in range(len(cajas[0])):
         cajas_class.append(Caja(DimBoard, 1, textures, 3, cajas[0][i]["pos"], cajas[0][i]["WHD"], cajas[0][i]["color"]))
 
+    contenedor_class.append(Camion([depth, height, width], [0, 0, 0], container_color))
+
+
+    
+
 def checkCollisions():
     for c in montacargas_class:
         for b in cajas_class:
@@ -214,6 +229,10 @@ def display():
     
     # Se dibujan las cajas
     for obj in cajas_class:
+        obj.draw()
+
+    # Se dibuja el contenedor
+    for obj in contenedor_class:
         obj.draw()
     
     # Se dibuja el piso del almacén

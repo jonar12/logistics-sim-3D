@@ -11,9 +11,9 @@ import math
 
 
 class Caja:
-    def __init__(self, dim, vel, textures, txtIndex, pos, body, hexColor):
+    def __init__(self, dim, vel, textures, txtIndex, pos, body, color):
         # Se inicializa las coordenadas de los vertices del cubo
-        self.color = hexColor
+        self.color = color
         self.body = body
 
         self.dim = dim
