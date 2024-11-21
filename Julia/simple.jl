@@ -34,45 +34,43 @@ end
 
 function agent_step!(agent::Lift, model)
     if isnothing(agent.carrying_box)
-        # Si el montacargas no lleva una caja, ir a la zona de cajas
-        move_towards(agent, (0, 0, 50), model)
+        # If the lift is not carrying a box, select one and move toward it
+        selected_box = select_box(agent, model)
+        agent.carrying_box = selected_box
 
-        # Debug nearby agents
-        # println("Nearby agents (Box only): ",
-        #     [agent for agent in nearby_agents(agent, model, 1.0) if agent isa Box])
-        # Esto detecta a los agentes Box cercanos al montacargas
-
-        # Detect nearby boxes
-        # Esto NO detecta a los agentes Box cercanos al montacargas
-        for agent in nearby_agents(agent, model, 1.0)
-            println("Nearby agent: ", agent)
-            println("Agent type: ", typeof(agent))
-
-            if agent isa Box
-                println("Box detected and selected: ", agent)
-
-                # Mark the box as being carried
-                agent.is_being_carried = true
-
-                # Assign the box to the lift
-                agent.carrying_box = agent
-                break
-            end
+        if selected_box !== nothing
+            # Move the lift toward the selected box
+            move_towards(agent, selected_box.pos, model)
+        else
+            println("No box available for agent $(agent.id) to carry.")
         end
     else
-        # Si el montacargas lleva una caja, mover caja y robot hacia posición final de la caja
-        move_towards(agent, agent.carrying_box.final_pos, model) # Movimiento del montacargas
-        move_towards(agent.carrying_box, agent.carrying_box.final_pos, model) # Movimiento de la caja
+        # If the lift is carrying a box, move towards the box's final position
+        box = agent.carrying_box
+
+        # Check if the lift is close enough to the box to begin simultaneous movement
+        distance_to_box = euclidean_distance(agent.pos, box.pos)
+        if distance_to_box < 1.0
+            # Simultaneously move the lift and the box toward the box's final position
+            move_towards(agent, box.final_pos, model)
+            move_towards(box, box.final_pos, model)
+        else
+            # Move the lift closer to the box
+            move_towards(agent, box.pos, model)
+        end
+
+        # Check if the lift and box have reached the final position
+        if agent.pos == box.final_pos && box.pos == box.final_pos
+            println("Agent $(agent.id) delivered box $(box.id) to its final position.")
+            agent.carrying_box = nothing
+            box.is_being_carried = false
+            box.is_stacked = true
+        end
     end
 end
 
 function agent_step!(agent::Box, model)
-    # El agente Box no realiza ninguna acción
-    # if agent.pos != agent.final_pos
-    #     move_towards(agent, agent.final_pos, model)
-    # else
-    #     agent.is_stacked = true
-    # end
+
 end
 
 function getBoxAndItem(data)
@@ -164,4 +162,25 @@ function initialize_lifts(model, n_lifts=5, spacing=10)
         lift.pos = (x, 0, 50)
         x += spacing
     end
+end
+
+
+function select_box(agent, model)
+    # Filter boxes that are not stacked and not being carried
+    boxes = [box for box in allagents(model) if box isa Box && !box.is_being_carried && !box.is_stacked]
+
+    # If there are available boxes, select one at random
+    if !isempty(boxes)
+        selected_box = rand(boxes)
+        # Mark the selected box as being carried
+        selected_box.is_being_carried = true
+        return selected_box
+    else
+        # Return nothing if no boxes are available
+        return nothing
+    end
+end
+
+function euclidean_distance(pos1::Tuple, pos2::Tuple)
+    return sqrt(sum((p1 - p2)^2 for (p1, p2) in zip(pos1, pos2)))
 end
