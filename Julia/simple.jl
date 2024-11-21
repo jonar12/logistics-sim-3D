@@ -59,13 +59,20 @@ function agent_step!(agent::Lift, model)
             move_towards(agent, box.pos, model)
         end
 
-        # Check if the lift and box have reached the final position
-        if agent.pos == box.final_pos && box.pos == box.final_pos
+        if agent.pos[3] <= model.container["depth"] && box.pos[3] <= model.container["depth"]
             println("Agent $(agent.id) delivered box $(box.id) to its final position.")
+            box.pos = box.final_pos
             agent.carrying_box = nothing
             box.is_being_carried = false
             box.is_stacked = true
         end
+        # Check if the lift and box have reached the final position
+        #if agent.pos == box.final_pos && box.pos == box.final_pos
+        #    println("Agent $(agent.id) delivered box $(box.id) to its final position.")
+        #    agent.carrying_box = nothing
+        #    box.is_being_carried = false
+        #    box.is_stacked = true
+        #end
     end
 end
 
@@ -78,7 +85,6 @@ function getBoxAndItem(data)
     return res
 end
 
-# TODO: Acomodar cajas en una linea con cierto padding
 function initialize_boxes(boxes, model, padding=2)
     x = 0
 
