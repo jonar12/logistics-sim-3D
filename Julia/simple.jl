@@ -59,6 +59,7 @@ function agent_step!(agent::Lift, model)
             move_towards(agent, box.pos, model)
         end
 
+        # Check if the lift and box have reached the position of the truck entrance
         if agent.pos[3] <= model.container["depth"] && box.pos[3] <= model.container["depth"]
             println("Agent $(agent.id) delivered box $(box.id) to its final position.")
             box.pos = box.final_pos
@@ -66,13 +67,6 @@ function agent_step!(agent::Lift, model)
             box.is_being_carried = false
             box.is_stacked = true
         end
-        # Check if the lift and box have reached the final position
-        #if agent.pos == box.final_pos && box.pos == box.final_pos
-        #    println("Agent $(agent.id) delivered box $(box.id) to its final position.")
-        #    agent.carrying_box = nothing
-        #    box.is_being_carried = false
-        #    box.is_stacked = true
-        #end
     end
 end
 
@@ -86,7 +80,7 @@ function getBoxAndItem(data)
 end
 
 function initialize_boxes(boxes, model, padding=2)
-    x = 0
+    z = model.container["depth"] + 20
 
     for box in boxes
         # Crear agente Box
@@ -94,12 +88,12 @@ function initialize_boxes(boxes, model, padding=2)
 
         # Inicializar propiedades del agente Box
         box_agent.WHD = rotate_box(box["rotation_type"], box["width"], box["height"], box["depth"])
-        box_agent.pos = (x, 0, 50)
+        box_agent.pos = (model.container["width"] + 10, 0, z)
         box_agent.final_pos = Tuple(box["position"])
         box_agent.color = random_hex_color()
 
         # Incrementar x por el ancho de la caja + un padding de separación entre cajas
-        x += box["width"] + padding
+        z += box["width"] + padding
     end
 end
 
@@ -109,16 +103,14 @@ function move_towards(agent, target_pos, model)
     dz = sign(target_pos[3] - agent.pos[3])
     dy = sign(target_pos[2] - agent.pos[2])
 
-    # Moverse primero en el eje x
-    if dx != 0
-        new_pos = (agent.pos[1] + dx, agent.pos[2], agent.pos[3])
+    if dy != 0
+        new_pos = (agent.pos[1], agent.pos[2] + dy, agent.pos[3])
         if is_valid_position(new_pos, model)
             agent.pos = new_pos
             return
         end
     end
 
-    # Si el movimiento en x no es valido o se completó, moverse en el eje z
     if dz != 0
         new_pos = (agent.pos[1], agent.pos[2], agent.pos[3] + dz)
         if is_valid_position(new_pos, model)
@@ -127,16 +119,14 @@ function move_towards(agent, target_pos, model)
         end
     end
 
-    # Si los movimientos en x y z no son validos o se completaron, moverse en el eje y
-    if dy != 0
-        new_pos = (agent.pos[1], agent.pos[2] + dy, agent.pos[3])
+    if dx != 0
+        new_pos = (agent.pos[1] + dx, agent.pos[2], agent.pos[3])
         if is_valid_position(new_pos, model)
             agent.pos = new_pos
             return
         end
     end
 end
-
 
 function is_valid_position(pos, model)
     # Verificar si la nueva posición esta dentro de los limites del modelo
@@ -161,15 +151,14 @@ function rotate_box(rotation_code::Int, width::Int, height::Int, depth::Int)
 end
 
 function initialize_lifts(model, n_lifts=5, spacing=10)
-    x = 100
+    z = 100
 
     for i in 1:n_lifts
         lift = add_agent!(Lift, model)
-        lift.pos = (x, 0, 50)
-        x += spacing
+        lift.pos = (div(model.container["width"], 2), 0, z)
+        z += spacing
     end
 end
-
 
 function select_box(agent, model)
     # Filter boxes that are not stacked and not being carried
