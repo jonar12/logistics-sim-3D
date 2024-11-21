@@ -16,7 +16,15 @@ route("/simulations", method=POST) do
     instances[id] = model
     step_counter[id] = 0
 
-    genie_json(Dict("Location" => "/simulations/$id", "container" => model.container))
+    boxes = [agent for agent in allagents(model) if agent isa Box]
+    lifts = [agent for agent in allagents(model) if agent isa Lift]
+
+    genie_json(Dict(
+        "Location" => "/simulations/$id",
+        "container" => model.container,
+        "boxes" => boxes,
+        "lifts" => lifts
+    ))
 end
 
 # Ruta para ejecutar pasos
@@ -24,18 +32,18 @@ route("/simulations/:id") do
     simulation_id = payload(:id)
     model = instances[simulation_id]
 
-    # Ejecutar un paso
+    # Ejecutar un paso de la simulación
     run!(model, 1)
     step_counter[simulation_id] += 1
 
     # Obtener estado actual
     boxes = [agent for agent in allagents(model) if agent isa Box]
-    robots = [agent for agent in allagents(model) if agent isa Robot]
+    lifts = [agent for agent in allagents(model) if agent isa Lift]
 
     genie_json(Dict(
         "step" => step_counter[simulation_id],
         "boxes" => boxes,
-        "robots" => robots
+        "lifts" => lifts
     ))
 end
 
