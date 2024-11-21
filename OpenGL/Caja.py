@@ -11,16 +11,13 @@ import math
 
 
 class Caja:
-    def __init__(self, dim, vel, textures, txtIndex, pos, body):
+    def __init__(self, dim, vel, textures, txtIndex, pos, body, hexColor):
         # Se inicializa las coordenadas de los vertices del cubo
-        self.vertexCoords = [1,1,1,1,1,-1,1,-1,-1,1,-1,1,-1,1,1,-1,1,-1,-1,-1,-1,-1,-1,1,]
-
+        self.color = hexColor
         self.body = body
 
         self.dim = dim
-        # Se inicializa una posicion aleatoria en el tablero
-        # self.position = [random.randint(-dim+15, dim-15), 2, random.randint(-dim+15, dim-15)]
-        self.position = [pos[0], 0.0, pos[2]]
+        self.position = [pos[0], 0, pos[2]]
 
         # Inicializar las coordenadas (x,y,z) del cubo en el tablero
         # almacenandolas en el vector position
@@ -68,12 +65,7 @@ class Caja:
         if self.alive:
             glPushMatrix()
             glTranslatef(self.position[0], self.position[1], self.position[2])
-            glScaled(2, 2, 2)
-            glColor3f(1.0, 1.0, 1.0)
-
-            glEnable(GL_TEXTURE_2D)
-            glBindTexture(GL_TEXTURE_2D, self.textures[self.txtIndex])
-
+            glColor3f(*self.color)
             glBegin(GL_QUADS)
             
             point = self.body[0]
@@ -143,5 +135,4 @@ class Caja:
             glVertex3d(self.position[0] + point, self.position[1], self.position[2])
 
             glEnd()
-            glDisable(GL_TEXTURE_2D)
             glPopMatrix()
