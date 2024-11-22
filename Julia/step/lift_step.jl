@@ -2,8 +2,19 @@ include("../agents/lift.jl")
 include("../utils/box_selection.jl")
 include("../utils/movement.jl")
 include("../utils/geometry_utils.jl")
+include("../utils/priority_management.jl")
+
+using DataStructures
 
 function agent_step!(agent::Lift, model)
+    # Check if the agent is at the top of the queue
+    if isempty(model.queue) || first(model.queue)[1] != agent
+        return # Skip this agent's turn
+    end
+
+    # Remove the agent from the queue as it is now active
+    dequeue!(model.queue)
+
     if isnothing(agent.carrying_box)
         # If the lift is not carrying a box, select one and move toward it
         selected_box = select_box(agent, model)
@@ -38,4 +49,7 @@ function agent_step!(agent::Lift, model)
             box.is_stacked = true
         end
     end
+
+    # Recalculate priority for the agent and requeue it
+    push!(model.queue, agent => agent.id)
 end
