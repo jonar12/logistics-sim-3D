@@ -13,7 +13,7 @@ class Montacarga:
     def __init__(self, dim, vel, pos, obj, materiales):
         self.materiales = materiales
         self.dim = dim
-        self.position = [pos[0], 6.7, pos[2]]
+        self.position = [pos[0], 0, pos[2]]
         # self.position = [pos[0], 18.5, pos[2]]
         # self.position = [pos[0], 0, pos[2]]
         
@@ -21,7 +21,7 @@ class Montacarga:
         dirZ = random.randint(-1, 1) or 1
         magnitude = math.sqrt(dirX**2 + dirZ**2)
         self.Direction = [(dirX / magnitude), 0, (dirZ / magnitude)]
-        self.angle = 0
+        self.angle = 180
         self.vel = vel
         self.scene = obj
         self.platformHeight = -1.5
@@ -47,7 +47,7 @@ class Montacarga:
         self.Direction = [(dirX / magnitude), 0, (dirZ / magnitude)]
 
     def setPosition(self, pos):
-        self.position = [pos[0], 6.7, pos[2]]
+        self.position = [pos[0], 0, pos[2]]
 
     def update(self):
         if self.status == 1:
@@ -143,7 +143,7 @@ class Montacarga:
         glTranslatef(self.position[0], self.position[1], self.position[2])
         glRotatef(self.angle, 0.0, 1.0, 0.0)
         # glScaled(0.085, 0.085, 0.085)
-        glScaled(0.03, 0.03, 0.03)
+        glScaled(0.04, 0.04, 0.04)
         
         glDisable(GL_LIGHTING)
         glDisable(GL_COLOR_MATERIAL)

@@ -55,6 +55,7 @@ Wall = []
 Wall_Obj = []
 House = []
 House2 = []
+House3 = []
 Car = []
 objetos = []
 
@@ -150,6 +151,8 @@ casa_1_obj = pywavefront.Wavefront('./models_3D/building/bulding.obj', create_ma
 casa_1_mtl = './models_3D/building/bulding.mtl'
 casa_2_obj = pywavefront.Wavefront('./models_3D/building/building2.obj', create_materials=True, collect_faces=True)
 casa_2_mtl = './models_3D/building/building2.mtl'
+casa_3_obj = pywavefront.Wavefront('./models_3D/building/bulding3.obj', create_materials=True, collect_faces=True)
+casa_3_mtl = './models_3D/building/uploads_files_2371092_hungar.mtl'
 #truck_obj = pywavefront.Wavefront('./models_3D/truck/minitruck.obj', create_materials=True, collect_faces=True)
 #truck_mtl = './models_3D/truck/minitruck.mtl'
 
@@ -157,10 +160,12 @@ casa_2_mtl = './models_3D/building/building2.mtl'
 ob = []
 ob.append(casa_1_obj)
 ob.append(casa_2_obj)
+ob.append(casa_3_obj)
 ##ob.append(truck_obj)
 mat = []
 mat.append(cargar_mtl(casa_1_mtl))
 mat.append(cargar_mtl(casa_2_mtl))
+mat.append(cargar_mtl(casa_3_mtl))
 #mat.append(cargar_mtl(truck_mtl))
 
 def Axis():
@@ -218,6 +223,8 @@ def Init():
     House2.append([-30, 0, 150])
     House2.append([110, 0, -40])
     
+    House3.append([80, -1, 80])
+    
     #CREACION DE LOS OBJETOS INDICADOS
     for i in Wall:
         [x11, z11, x22, z22, jump] = i
@@ -244,6 +251,9 @@ def Init():
         
     for i in House2:   
         objetos.append(Comp(DimBoard, 1, i,  ob[1], mat[1], [10,10,10], 90))
+        
+    for i in House3:   
+        objetos.append(Comp(DimBoard, 1, i,  ob[2], mat[2], [0.030,0.030,0.030], 90))
     
     #w Texturas
     for i in filenames_objects:
