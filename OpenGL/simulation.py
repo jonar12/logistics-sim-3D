@@ -127,6 +127,7 @@ filenames_objects = ["./textures/acero_negro.png", "./textures/llanta.png", "./t
 
 # Desde aqui es filename 5:
 filenames_objects.append("./textures/sky.png")
+filenames_objects.append("./textures/road.png")
 
 # Cargamos los puntos del archivo .obj del Montacarga
 montacarga_obj = pywavefront.Wavefront('./models_3D/Forklift.obj', create_materials=True, collect_faces=True)
@@ -284,6 +285,17 @@ def display(step):
     glVertex3d(DimBoard, 0, DimBoard)
     glTexCoord2f(1.0, 0.0)
     glVertex3d(DimBoard, 0, -DimBoard)
+    
+    glBindTexture(GL_TEXTURE_2D, textures[4])
+    glBegin(GL_QUADS)
+    glTexCoord2f(0.0, 0.0)
+    glVertex3d(0, 0, 0)
+    glTexCoord2f(0.0, 1.0)
+    glVertex3d(0, 0, 40)
+    glTexCoord2f(1.0, 1.0)
+    glVertex3d(80, 0, 40)
+    glTexCoord2f(1.0, 0.0)
+    glVertex3d(80, 0, 0)
 
     glEnd()
     glDisable(GL_TEXTURE_2D)
