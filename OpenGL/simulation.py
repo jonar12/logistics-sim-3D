@@ -30,8 +30,6 @@ URL_BASE = "http://localhost:8000"
 response = requests.post(URL_BASE + "/simulations", allow_redirects = False)
 data = response.json()
 LOCATION = data["Location"] # ID de la simulación
-# print("Datos:", data)
-# print("Ubicación:", LOCATION)
 
 # Obtener la dimensión del contenedor
 (xColor, yColor, zColor) = ImageColor.getcolor("#e4ff00", "RGB")
@@ -45,6 +43,7 @@ depth = container["depth"]
 height = container["height"]
 width = container["width"]
 
+# Guardar los datos de las cajas y los montacargas
 cajas = []
 montacargas = []
 
@@ -52,7 +51,7 @@ montacargas = []
 async def asynchronous_call():
     start_time = datetime.now()
     async with aiohttp.ClientSession() as session:
-        for _ in range(100):
+        for _ in range(400):
             async with session.get(URL_BASE + LOCATION) as response:
                 response = await response.json()
 
@@ -68,7 +67,6 @@ async def asynchronous_call():
                     x, y, z = ImageColor.getcolor(color, "RGB")
                     caja[i]["color"] = (x / 255, y / 255, z / 255)
 
-
                 montacargas.append(montacarga)
                 cajas.append(caja)
 
@@ -76,14 +74,11 @@ async def asynchronous_call():
     print("Tiempo de ejecución:", end_time - start_time)
 
 asyncio.run(asynchronous_call())
-
-print("Cajas:", len(cajas[0]))
-print("Montacargas:", len(montacargas[0]))
-
-print(montacargas[0])
-
+print("Caja:", cajas[0])
+# Definimos las dimensiones de la pantalla
 screen_width = 500
 screen_height = 500
+
 #vc para el obser.
 FOVY=60.0
 ZNEAR=0.01
@@ -125,8 +120,6 @@ filenames_objects = ["./textures/acero_negro.png", "./textures/llanta.png", "./t
 # Cargamos los puntos del archivo .obj del Montacarga
 montacarga_obj = pywavefront.Wavefront('./models_3D/Forklift.obj', create_materials=True, collect_faces=True)
 montacarga_mtl = './models_3D/Forklift.mtl'
-# montacarga_obj = pywavefront.Wavefront('./models_3D/ImageToStl.com_forklift2.obj', collect_faces=True, create_materials=True)
-# montacarga_mtl = './models_3D/forklift2.mtl'
 
 # Cargar materiales del archivo .mtl
 materiales = cargar_mtl(montacarga_mtl)
@@ -187,45 +180,36 @@ def Init():
     for i in filenames_objects:
         Texturas(i)
     
+    # Se crean los montacargas y las cajas por primera vez
     for i in range(len(montacargas[0])):
         montacargas_class.append(Montacarga(DimBoard, 0.7, montacargas[0][i]["pos"], montacarga_obj, materiales))
         
     for i in range(len(cajas[0])):
         cajas_class.append(Caja(DimBoard, 1, textures, 3, cajas[0][i]["pos"], cajas[0][i]["WHD"], cajas[0][i]["color"]))
 
+    # Se crea el contenedor
     contenedor_class.append(Camion([depth, height, width], [0, 0, 0], container_color))
 
-
-    
-
-def checkCollisions():
-    for c in montacargas_class:
-        for b in cajas_class:
-            distance = sqrt(pow((b.position[0] - c.position[0]), 2) + pow((b.position[2] - c.position[2]), 2))
-            if distance <= c.radiusCol:
-                if c.status == 0 and b.alive:
-                    b.alive = False
-                    c.status = 1
-
-def display():
+def display(step):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
-    # Se dibujan los montacargas   
+    # Se actualizan los datos de los objetos
+
+    # Actualizar la posición de los montacargas
+    if step < len(montacargas):
+        for cont, montacarga in enumerate(montacargas[step]):
+            pos = montacarga["pos"]
+            montacargas_class[cont].setPosition(pos)
+
+    # Actualizar la posición de las cajas
+    if step < len(cajas):
+        for cont, caja in enumerate(cajas[step]):
+            pos = caja["pos"]
+            cajas_class[cont].setPosition(pos)
+
+    # Dibujar los montacargas
     for obj in montacargas_class:
         obj.draw()
-        # obj.update()    
-
-    # Se dibuja el incinerador
-    glColor3f(1.0, 0.5, 0.0)  # Color: Naranja
-    square_size = 20.0  # Tamaño
-
-    half_size = square_size / 2.0
-    glBegin(GL_QUADS)
-    glVertex3d(-half_size, 0.5, -half_size)
-    glVertex3d(-half_size, 0.5, half_size)
-    glVertex3d(half_size, 0.5, half_size)
-    glVertex3d(half_size, 0.5, -half_size)
-    glEnd()
     
     # Se dibujan las cajas
     for obj in cajas_class:
@@ -251,8 +235,6 @@ def display():
 
     glEnd()
     glDisable(GL_TEXTURE_2D)
-
-    checkCollisions()
 
 # Manipulación de la posición del observador
 speed_movement = 1.0
@@ -310,10 +292,16 @@ def handleMovement(keys):
     CENTER_X = EYE_X + dir_x
     CENTER_Y = EYE_Y  # Mantener la misma altura
     CENTER_Z = EYE_Z + dir_z
+    # CENTER_X = 0.0
+    # CENTER_Y = 0.0
+    # CENTER_Z = 0.0
     
 Init()
 
 done = False
+
+# Pasos de simulación
+simulation_step = 0
 while not done:
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
@@ -321,7 +309,6 @@ while not done:
                 done = True
         if event.type == pygame.QUIT:
             done = True
-
     keys = pygame.key.get_pressed()  # Checking pressed keys
 
     # Movimientos del observador
@@ -330,10 +317,12 @@ while not done:
     glLoadIdentity() # Cargamos la matriz identidad para limpiar la matriz de modelado
     gluLookAt(EYE_X, EYE_Y, EYE_Z, CENTER_X, CENTER_Y, CENTER_Z, UP_X, UP_Y, UP_Z)
 
-    display()
+    # Actualizar objetos por cada segundo
+    display(simulation_step)
+    simulation_step += 1
     Axis()
 
     pygame.display.flip()
     pygame.time.wait(10)
-
+    
 pygame.quit()

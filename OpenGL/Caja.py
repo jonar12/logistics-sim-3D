@@ -60,79 +60,81 @@ class Caja:
         # Se debe verificar que el objeto cubo, con su nueva posible direccion
         # no se salga del plano actual (DimBoard)
         # ...
+    def setPosition(self, pos):
+        self.position = pos
 
     def draw(self):
-        if self.alive:
-            glPushMatrix()
-            glTranslatef(self.position[0], self.position[1], self.position[2])
-            glColor3f(*self.color)
-            glBegin(GL_QUADS)
-            
-            point = self.body[0]
-            point1 = self.body[1]
-            point2 = self.body[2]
+        glPushMatrix()
+        glTranslatef(self.position[0], self.position[1], self.position[2])
+        glColor3f(*self.color)
 
-            # Dibujado de las caras de la caja
+        glBegin(GL_QUADS)
 
-            # Cara frontal
-            glTexCoord2f(0.0, 0.0)
-            glVertex3d(self.position[0], self.position[1], self.position[2])
-            glTexCoord2f(0.0, 1.0)
-            glVertex3d(self.position[0], self.position[1] + point1, self.position[2])
-            glTexCoord2f(1.0, 1.0)
-            glVertex3d(self.position[0] + point, self.position[1] + point1, self.position[2])
-            glTexCoord2f(1.0, 0.0)
-            glVertex3d(self.position[0] + point, self.position[1], self.position[2])
+        # Definir un punto de referencia para el dibujado el cubo
+        x, y, z = 0, 0, 0
 
-            # Cara trasera
-            glTexCoord2f(0.0, 0.0)
-            glVertex3d(self.position[0], self.position[1], self.position[2] + point2)
-            glTexCoord2f(0.0, 1.0)
-            glVertex3d(self.position[0], self.position[1] + point1, self.position[2] + point2)
-            glTexCoord2f(1.0, 1.0)
-            glVertex3d(self.position[0] + point, self.position[1] + point1, self.position[2] + point2)
-            glTexCoord2f(1.0, 0.0)
-            glVertex3d(self.position[0] + point, self.position[1], self.position[2] + point2)
+        # Dimensiones de la caja
+        width, height, depth = self.body
 
-            # Cara izquierda
-            glTexCoord2f(0.0, 0.0)
-            glVertex3d(self.position[0], self.position[1], self.position[2])
-            glTexCoord2f(0.0, 1.0)
-            glVertex3d(self.position[0], self.position[1] + point1, self.position[2])
-            glTexCoord2f(1.0, 1.0)
-            glVertex3d(self.position[0], self.position[1] + point1, self.position[2] + point2)
-            glTexCoord2f(1.0, 0.0)
-            glVertex3d(self.position[0], self.position[1], self.position[2] + point2)
+        # Cara frontal
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x, y, z)
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x + width, y, z)
+        glTexCoord2f(1.0, 1.0)
+        glVertex3f(x + width, y + height, z)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x, y + height, z)
 
-            # Cara derecha
-            glTexCoord2f(0.0, 0.0)
-            glVertex3d(self.position[0] + point, self.position[1], self.position[2])
-            glTexCoord2f(0.0, 1.0)
-            glVertex3d(self.position[0] + point, self.position[1] + point1, self.position[2])
-            glTexCoord2f(1.0, 1.0)
-            glVertex3d(self.position[0] + point, self.position[1] + point1, self.position[2] + point2)
-            glTexCoord2f(1.0, 0.0)
-            glVertex3d(self.position[0] + point, self.position[1], self.position[2] + point2)
+        # Cara trasera
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x, y, z + depth)
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x + width, y, z + depth)
+        glTexCoord2f(1.0, 1.0)
+        glVertex3f(x + width, y + height, z + depth)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x, y + height, z + depth)
 
-            # Cara superior
-            glTexCoord2f(0.0, 0.0)
-            glVertex3d(self.position[0], self.position[1] + point1, self.position[2])
-            glTexCoord2f(0.0, 1.0)
-            glVertex3d(self.position[0], self.position[1] + point1, self.position[2] + point2)
-            glTexCoord2f(1.0, 1.0)
-            glVertex3d(self.position[0] + point, self.position[1] + point1, self.position[2] + point2)
-            glTexCoord2f(1.0, 0.0)
-            glVertex3d(self.position[0] + point, self.position[1] + point1, self.position[2])
+        # Cara izquierda
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x, y, z)
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x, y, z + depth)
+        glTexCoord2f(1.0, 1.0)
+        glVertex3f(x, y + height, z + depth)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x, y + height, z)
 
-            # Cara inferior
-            glTexCoord2f(0.0, 0.0)
-            glVertex3d(self.position[0], self.position[1], self.position[2])
-            glTexCoord2f(0.0, 1.0)
-            glVertex3d(self.position[0], self.position[1], self.position[2] + point2)
-            glTexCoord2f(1.0, 1.0)
-            glVertex3d(self.position[0] + point, self.position[1], self.position[2] + point2)
-            glTexCoord2f(1.0, 0.0)
-            glVertex3d(self.position[0] + point, self.position[1], self.position[2])
+        # Cara derecha
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x + width, y, z)
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x + width, y, z + depth)
+        glTexCoord2f(1.0, 1.0)
+        glVertex3f(x + width, y + height, z + depth)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x + width, y + height, z)
 
-            glEnd()
-            glPopMatrix()
+        # Cara superior
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x, y + height, z)
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x + width, y + height, z)
+        glTexCoord2f(1.0, 1.0)
+        glVertex3f(x + width, y + height, z + depth)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x, y + height, z + depth)
+
+        # Cara inferior
+        glTexCoord2f(0.0, 0.0)
+        glVertex3f(x, y, z)
+        glTexCoord2f(1.0, 0.0)
+        glVertex3f(x + width, y, z)
+        glTexCoord2f(1.0, 1.0)
+        glVertex3f(x + width, y, z + depth)
+        glTexCoord2f(0.0, 1.0)
+        glVertex3f(x, y, z + depth)
+
+        glEnd()
+        glPopMatrix()
