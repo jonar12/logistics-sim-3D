@@ -6,7 +6,6 @@ class Camion:
     def __init__(self, body, pos, color):
         self.posicion = pos
         self.body = body
-        self.body2 = [15, 10, 22]
         self.color = color
         self.display_list = self.create_display_list()
     
@@ -14,9 +13,9 @@ class Camion:
         display_list = glGenLists(1)
         glNewList(display_list, GL_COMPILE)
         
-        point = self.body2[0]
-        point1 = self.body2[1]
-        point2 = self.body2[2]
+        point = self.body[0]
+        point1 = self.body[1]
+        point2 = self.body[2]
 
         glEnable(GL_BLEND)
         glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA)

@@ -60,7 +60,7 @@ objetos = []
 async def asynchronous_call():
     start_time = datetime.now()
     async with aiohttp.ClientSession() as session:
-        for _ in range(400):
+        for _ in range(1500):
             async with session.get(URL_BASE + LOCATION) as response:
                 response = await response.json()
 
@@ -233,7 +233,6 @@ def Init():
     for i in range(len(montacargas[0])):
         montacargas_class.append(Montacarga(DimBoard, 0.7, montacargas[0][i]["pos"], montacarga_obj, materiales))
         
-        
     for i in range(len(cajas[0])):
         cajas_class.append(Caja(DimBoard, 1, textures, 3, cajas[0][i]["pos"], cajas[0][i]["WHD"], cajas[0][i]["color"]))
 
@@ -242,7 +241,7 @@ def Init():
 
     # Crear el objetos para decorar el ambiente
     # ambiente_class.append(Ambiente([10.0, 5.0, -20.0], [3.0, 3.0, 3.0], building_obj, materiales2, 90, [0.0, 1.0, 0.0]))
-    ambiente_class.append(Ambiente([7.7, 8.9, -5.0], [1.6, 3.0, 3.0], building_obj, materiales2, 90, [0.0, 1.0, 0.0]))
+    ambiente_class.append(Ambiente([11.4, 8.9, -13.0], [1.6, 3.0, 3.0], building_obj, materiales2, 90, [0.0, 1.0, 0.0]))
 
 def display(step):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -251,8 +250,11 @@ def display(step):
 
     # Actualizar la posición de los montacargas
     if step < len(montacargas):
+        print("Step:", step)
         for cont, montacarga in enumerate(montacargas[step]):
+            print("Montacarga:", cont)
             pos = montacarga["pos"]
+            print("Posición:", pos)
             montacargas_class[cont].setPosition(pos)
 
     # Actualizar la posición de las cajas
@@ -306,25 +308,25 @@ def display(step):
     glBindTexture(GL_TEXTURE_2D, textures[6])
     glBegin(GL_QUADS)
     glTexCoord2f(0.0, 0.0)
-    glVertex3d(-13.0, -8.8, 0)
+    glVertex3d(-10.5, -8.8, 0)
     glTexCoord2f(0.0, 1.0)
-    glVertex3d(-13.0, -8.8, DimBoard)
+    glVertex3d(-10.5, -8.8, DimBoard)
     glTexCoord2f(1.0, 1.0)
-    glVertex3d(28.0, -8.8, DimBoard)
+    glVertex3d(33.0, -8.8, DimBoard)
     glTexCoord2f(1.0, 0.0)
-    glVertex3d(28.0, -8.8, 0)
+    glVertex3d(33.0, -8.8, 0)
     glEnd()
 
     glBindTexture(GL_TEXTURE_2D, textures[6])
     glBegin(GL_QUADS)
     glTexCoord2f(0.0, 0.0)
-    glVertex3d(-13.0, -8.8, 0)
+    glVertex3d(-10.5, -8.8, 0)
     glTexCoord2f(0.0, 1.0)
-    glVertex3d(-13.0, -8.8, -DimBoard)
+    glVertex3d(-10.5, -8.8, -DimBoard)
     glTexCoord2f(1.0, 1.0)
-    glVertex3d(28, -8.8, -DimBoard)
+    glVertex3d(33.0, -8.8, -DimBoard)
     glTexCoord2f(1.0, 0.0)
-    glVertex3d(28, -8.8, 0)
+    glVertex3d(33.0, -8.8, 0)
     glEnd()
     glDisable(GL_TEXTURE_2D)
 
