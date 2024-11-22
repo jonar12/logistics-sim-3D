@@ -47,6 +47,8 @@ const BoxVisualization = () => {
       setContainer(data.container);
       // Set lift data from the API response
       setLifts(data.lifts);
+      // Set boxes data from the API response
+      setBoxes(data.boxes);
       console.log("Container data: ", data.container);
     } catch (error) {
       let errorMessage = "Failed to initialize simulation";
@@ -76,7 +78,6 @@ const BoxVisualization = () => {
       setBoxes(data.boxes);
       // Set lift data from the API response
       setLifts(data.lifts);
-
       setStep(data.step);
     } catch (error) {
       let errorMessage = "Failed to step simulation";
@@ -98,7 +99,7 @@ const BoxVisualization = () => {
     if (isRunning) {
       interval = setInterval(() => {
         stepSimulation();
-      }, 100);
+      }, 50);
     }
     return () => clearInterval(interval);
   }, [isRunning, simulationId]);
