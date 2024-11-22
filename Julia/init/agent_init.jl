@@ -13,8 +13,8 @@ function initialize_lifts(model, n_lifts=1, spacing=10)
     end
 end
 
-function initialize_boxes(boxes, model, padding=2)
-    z = model.container["depth"] + 20
+function initialize_boxes(boxes, model, padding=1)
+    z = model.container["depth"] + 10
 
     for box in boxes
         # Crear agente Box

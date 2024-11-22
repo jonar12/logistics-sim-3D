@@ -6,9 +6,14 @@ function select_box(agent, model)
     # Filter boxes that are not stacked and not being carried
     boxes = [box for box in allagents(model) if box isa Box && !box.is_being_carried && !box.is_stacked]
 
-    # If there are available boxes, select one at random
+    # If there are available boxes, prioritize based on final_pos y and z
     if !isempty(boxes)
-        selected_box = rand(boxes)
+        # Sort boxes by final_pos (first by y, then by z)
+        sorted_boxes = sort(boxes, by = box -> (box.final_pos[2], box.final_pos[3]))
+
+        # Select the highest-priority box (first in the sorted list)
+        selected_box = first(sorted_boxes)
+
         # Mark the selected box as being carried
         selected_box.is_being_carried = true
         return selected_box
