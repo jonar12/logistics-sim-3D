@@ -33,6 +33,7 @@ URL_BASE = "http://localhost:8000"
 response = requests.post(URL_BASE + "/simulations", allow_redirects = False)
 data = response.json()
 LOCATION = data["Location"] # ID de la simulación
+sky = 2000
 
 # Obtener la dimensión del contenedor
 (xColor, yColor, zColor) = ImageColor.getcolor("#e4ff00", "RGB")
@@ -275,7 +276,15 @@ def Init():
 
 def display(step):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
-
+    Axis()
+    #Se dibuja el plano gris
+    glColor3f(0.53, 0.81, 0.92)
+    glBegin(GL_QUADS)
+    glVertex3d(-sky, 300, -sky)
+    glVertex3d(-sky, 300, sky)
+    glVertex3d(sky, 300, sky)
+    glVertex3d(sky, 300, -sky)
+    glEnd()
     # Se actualizan los datos de los objetos
 
     # Actualizar la posición de los montacargas
