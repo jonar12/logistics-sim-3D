@@ -11,3 +11,7 @@ function post_request(url::String, json_body::Dict)
     # Return the response
     return JSON.parse(String(response.body))
 end
+
+function getBoxAndItem(data)
+    return post_request("http://localhost:5050/setItemAndBox", data)
+end

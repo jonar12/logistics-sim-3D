@@ -1,5 +1,11 @@
-include("simple.jl")
-using Genie, Genie.Requests, UUIDs, Agents, HTTP
+include("agents/box.jl")
+include("agents/lift.jl")
+include("init/model_init.jl")
+
+using Agents
+using Genie, Genie.Requests
+using UUIDs
+using HTTP
 import Genie.Renderer.Json: json as genie_json
 
 # Diccionarios de simulaciones y pasos
