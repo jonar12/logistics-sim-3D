@@ -24,6 +24,7 @@ from Montacarga import Montacarga
 from Fake_Compiler import Comp
 from Caja import Caja
 from Camion import Camion
+from Ambiente import Ambiente
 from PIL import ImageColor
 from O_Wall import Walls
 
@@ -116,6 +117,7 @@ DimBoard = 200
 contenedor_class = []
 montacargas_class = []
 cajas_class = []
+ambiente_class = []
 
 # Variables para el control del observador
 theta = -135.0
@@ -133,20 +135,23 @@ filenames_objects.append("./textures/road.png")
 montacarga_obj = pywavefront.Wavefront('./models_3D/Forklift.obj', create_materials=True, collect_faces=True)
 montacarga_mtl = './models_3D/Forklift.mtl'
 
+# Cargamos los archivos .obj para decorar el ambiente
+building_obj = pywavefront.Wavefront('./models_3D/truck.obj', create_materials=True, collect_faces=True)
+building_mtl = './models_3D/truck.mtl'
+
 # Cargar materiales del archivo .mtl
 materiales = cargar_mtl(montacarga_mtl)
-
-
+materiales2 = cargar_mtl(building_mtl)
 
 # Otros materiales y objetos
-casa_1_obj = pywavefront.Wavefront('./models_3D/houses/obj_House.obj', create_materials=True, collect_faces=True)
-casa_1_mtl = './models_3D/houses/material.lib'
+# casa_1_obj = pywavefront.Wavefront('./models_3D/houses/obj_House.obj', create_materials=True, collect_faces=True)
+# casa_1_mtl = './models_3D/houses/material.lib'
 
 # Materiales y objetos
 ob = []
-ob.append(casa_1_obj)
+# ob.append(casa_1_obj)
 mat = []
-mat.append(cargar_mtl(casa_1_mtl))
+# mat.append(cargar_mtl(casa_1_mtl))
 
 def Axis():
     glShadeModel(GL_FLAT)
@@ -217,10 +222,10 @@ def Init():
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
     
     #Creando a las casas
-    for i in House:   
-        objetos.append(Comp(DimBoard, 1, i,  ob[0], mat[0], [10,10,10]))
+    # for i in House:   
+    #     objetos.append(Comp(DimBoard, 1, i,  ob[0], mat[0], [10,10,10]))
     
-    # Texturas
+    #w Texturas
     for i in filenames_objects:
         Texturas(i)
     
@@ -234,6 +239,10 @@ def Init():
 
     # Se crea el contenedor
     contenedor_class.append(Camion([depth, height, width], [0, 0, 0], container_color))
+
+    # Crear el objetos para decorar el ambiente
+    # ambiente_class.append(Ambiente([10.0, 5.0, -20.0], [3.0, 3.0, 3.0], building_obj, materiales2, 90, [0.0, 1.0, 0.0]))
+    ambiente_class.append(Ambiente([7.7, 8.9, -5.0], [1.6, 3.0, 3.0], building_obj, materiales2, 90, [0.0, 1.0, 0.0]))
 
 def display(step):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -265,48 +274,57 @@ def display(step):
         obj.draw()
     
     # Se dibuja las paredes
-    for obj in Wall_Obj:
-        obj.drawCube(textures, 5) # 0 sky 1 void
+    # for obj in Wall_Obj:
+    #     obj.drawCube(textures, 5) # 0 sky 1 void
         
     # Dibujar los montacargas
-    for obj in objetos:
+    # for obj in objetos:
+    #     obj.draw()
+
+    # Dibujar los objetos para decorar el ambiente
+    for obj in ambiente_class:
         obj.draw()
     
     # Se dibuja el piso del almacén
+
+    # Piso de concreto
     glColor3f(1.0, 1.0, 1.0)
     glEnable(GL_TEXTURE_2D)
     glBindTexture(GL_TEXTURE_2D, textures[4])
     glBegin(GL_QUADS)
     glTexCoord2f(0.0, 0.0)
-    glVertex3d(-DimBoard, 0, -DimBoard)
+    glVertex3d(-DimBoard, -9.0, -DimBoard)
     glTexCoord2f(0.0, 1.0)
-    glVertex3d(-DimBoard, 0, DimBoard)
+    glVertex3d(-DimBoard, -9.0, DimBoard)
     glTexCoord2f(1.0, 1.0)
-    glVertex3d(DimBoard, 0, DimBoard)
+    glVertex3d(DimBoard, -9.0, DimBoard)
     glTexCoord2f(1.0, 0.0)
-    glVertex3d(DimBoard, 0, -DimBoard)
+    glVertex3d(DimBoard, -9.0, -DimBoard)
     glEnd()
+
+    # Carretera
     glBindTexture(GL_TEXTURE_2D, textures[6])
     glBegin(GL_QUADS)
     glTexCoord2f(0.0, 0.0)
-    glVertex3d(0, 0.2, 0)
+    glVertex3d(-13.0, -8.8, 0)
     glTexCoord2f(0.0, 1.0)
-    glVertex3d(0, 0.2, DimBoard)
+    glVertex3d(-13.0, -8.8, DimBoard)
     glTexCoord2f(1.0, 1.0)
-    glVertex3d(20, 0.2, DimBoard)
+    glVertex3d(28.0, -8.8, DimBoard)
     glTexCoord2f(1.0, 0.0)
-    glVertex3d(20, 0.2, 0)
+    glVertex3d(28.0, -8.8, 0)
     glEnd()
+
     glBindTexture(GL_TEXTURE_2D, textures[6])
     glBegin(GL_QUADS)
     glTexCoord2f(0.0, 0.0)
-    glVertex3d(0, 0.2, 0)
+    glVertex3d(-13.0, -8.8, 0)
     glTexCoord2f(0.0, 1.0)
-    glVertex3d(0, 0.2, -DimBoard)
+    glVertex3d(-13.0, -8.8, -DimBoard)
     glTexCoord2f(1.0, 1.0)
-    glVertex3d(20, 0.2, -DimBoard)
+    glVertex3d(28, -8.8, -DimBoard)
     glTexCoord2f(1.0, 0.0)
-    glVertex3d(20, 0.2, 0)
+    glVertex3d(28, -8.8, 0)
     glEnd()
     glDisable(GL_TEXTURE_2D)
 
@@ -366,9 +384,6 @@ def handleMovement(keys):
     CENTER_X = EYE_X + dir_x
     CENTER_Y = EYE_Y  # Mantener la misma altura
     CENTER_Z = EYE_Z + dir_z
-    # CENTER_X = 0.0
-    # CENTER_Y = 0.0
-    # CENTER_Z = 0.0
     
 Init()
 
