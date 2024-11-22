@@ -12,7 +12,7 @@ class Camion:
     def create_display_list(self):
         display_list = glGenLists(1)
         glNewList(display_list, GL_COMPILE)
-        print(self.body)
+        
         point = self.body[0]
         point1 = self.body[1]
         point2 = self.body[2]
