@@ -1,0 +1,68 @@
+# Aspose.3D Wavefront OBJ Exporter
+# Copyright 2004-2024 Aspose Pty Ltd.
+# File created: 11/20/2024 18:31:46
+
+newmtl wood
+	illum 2
+	Kd 0.102473 0.0487633 0.0470242
+	Ke 0 0 0
+	Pr 0.98657095
+	Pm 0
+	d 1
+	Tr 0
+newmtl wall_material
+	illum 2
+	Kd 0.8 0.519258 0.322644
+	Ke 0 0 0
+	Pr 0.87371844
+	Pm 0
+	d 1
+	Tr 0
+newmtl window
+	illum 2
+	Kd 0.00391567 0.282679 0.570469
+	Ke 0 0 0
+	Pr 0
+	Pm 0
+	d 1
+	Tr 0
+newmtl roof_material
+	illum 2
+	Kd 0.266759 0.121367 0.116734
+	Ke 0 0 0
+	Pr 0.9660246
+	Pm 0
+	d 1
+	Tr 0
+newmtl Door
+	illum 2
+	Kd 0.77427 0.144496 0.136265
+	Ke 0 0 0
+	Pr 0.9378839
+	Pm 0
+	d 1
+	Tr 0
+newmtl doorknob
+	illum 2
+	Kd 1 0.561988 0
+	Ke 0 0 0
+	Pr 1
+	Pm 0
+	d 1
+	Tr 0
+newmtl roof_material2
+	illum 2
+	Kd 0.4672 0.183943 0.183943
+	Ke 0 0 0
+	Pr 0.9454034
+	Pm 0
+	d 1
+	Tr 0
+newmtl chimney_material
+	illum 2
+	Kd 0.401967 0.263403 0.165745
+	Ke 0 0 0
+	Pr 0.93609077
+	Pm 0
+	d 1
+	Tr 0

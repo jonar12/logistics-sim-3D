@@ -21,9 +21,11 @@ from OpenGL.GLUT import *
 from math import *
 from random import *
 from Montacarga import Montacarga
+from Fake_Compiler import Comp
 from Caja import Caja
 from Camion import Camion
 from PIL import ImageColor
+from O_Wall import Walls
 
 # Llamada a la API
 URL_BASE = "http://localhost:8000"
@@ -46,6 +48,12 @@ width = container["width"]
 # Guardar los datos de las cajas y los montacargas
 cajas = []
 montacargas = []
+
+# Almaceniamiento de diversos objetos:
+Wall = []
+Wall_Obj = []
+House = []
+objetos = []
 
 # Realizar las llamadas a la API asíncronamente	
 async def asynchronous_call():
@@ -85,7 +93,7 @@ ZNEAR=0.01
 ZFAR=1800.0
 #Variables para definir la posicion del observador
 EYE_X=300.0
-EYE_Y=200.0
+EYE_Y=100.0
 EYE_Z=300.0
 CENTER_X=0.0
 CENTER_Y=0.0
@@ -110,12 +118,15 @@ montacargas_class = []
 cajas_class = []
 
 # Variables para el control del observador
-theta = 0.0
+theta = -135.0
 radius = 300
 
 # Arreglo para el manejo de texturas
 textures = []
 filenames_objects = ["./textures/acero_negro.png", "./textures/llanta.png", "./textures/acero_amarillo.png", "./textures/caja.png", "./textures/piso_almacen.png"]
+
+# Desde aqui es filename 5:
+filenames_objects.append("./textures/sky.png")
 
 # Cargamos los puntos del archivo .obj del Montacarga
 montacarga_obj = pywavefront.Wavefront('./models_3D/Forklift.obj', create_materials=True, collect_faces=True)
@@ -123,6 +134,18 @@ montacarga_mtl = './models_3D/Forklift.mtl'
 
 # Cargar materiales del archivo .mtl
 materiales = cargar_mtl(montacarga_mtl)
+
+
+
+# Otros materiales y objetos
+casa_1_obj = pywavefront.Wavefront('./models_3D/houses/obj_House.obj', create_materials=True, collect_faces=True)
+casa_1_mtl = './models_3D/houses/material.lib'
+
+# Materiales y objetos
+ob = []
+ob.append(casa_1_obj)
+mat = []
+mat.append(cargar_mtl(casa_1_mtl))
 
 def Axis():
     glShadeModel(GL_FLAT)
@@ -162,6 +185,21 @@ def Texturas(filepath):
     glGenerateMipmap(GL_TEXTURE_2D)
 
 def Init():
+    
+    # Pared frontal
+    Wall.append([-40, -40, -40, DimBoard, False])
+    Wall.append([-40, -40, DimBoard, -40, False])
+    
+    # Casa de prueba
+    House.append([-40, 0, 0])
+    
+    House.append([-40, 0, 150])
+    
+    #CREACION DE LOS OBJETOS INDICADOS
+    for i in Wall:
+        [x11, z11, x22, z22, jump] = i
+        Wall_Obj.append(Walls(x11, z11, x22, z22, jump))
+    
     screen = pygame.display.set_mode(
         (screen_width, screen_height), DOUBLEBUF | OPENGL)
     pygame.display.set_caption("OpenGL: Simulacion de almacen")
@@ -177,12 +215,18 @@ def Init():
     glEnable(GL_DEPTH_TEST)
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
     
+    #Creando a las casas
+    for i in House:   
+        objetos.append(Comp(DimBoard, 1, i,  ob[0], mat[0], [10,10,10]))
+    
+    # Texturas
     for i in filenames_objects:
         Texturas(i)
     
     # Se crean los montacargas y las cajas por primera vez
     for i in range(len(montacargas[0])):
         montacargas_class.append(Montacarga(DimBoard, 0.7, montacargas[0][i]["pos"], montacarga_obj, materiales))
+        
         
     for i in range(len(cajas[0])):
         cajas_class.append(Caja(DimBoard, 1, textures, 3, cajas[0][i]["pos"], cajas[0][i]["WHD"], cajas[0][i]["color"]))
@@ -217,6 +261,14 @@ def display(step):
 
     # Se dibuja el contenedor
     for obj in contenedor_class:
+        obj.draw()
+    
+    # Se dibuja las paredes
+    for obj in Wall_Obj:
+        obj.drawCube(textures, 5) # 0 sky 1 void
+        
+    # Dibujar los montacargas
+    for obj in objetos:
         obj.draw()
     
     # Se dibuja el piso del almacén
