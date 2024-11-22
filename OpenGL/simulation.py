@@ -296,7 +296,17 @@ def display(step):
     glVertex3d(20, 0.2, DimBoard)
     glTexCoord2f(1.0, 0.0)
     glVertex3d(20, 0.2, 0)
-
+    glEnd()
+    glBindTexture(GL_TEXTURE_2D, textures[6])
+    glBegin(GL_QUADS)
+    glTexCoord2f(0.0, 0.0)
+    glVertex3d(0, 0.2, 0)
+    glTexCoord2f(0.0, 1.0)
+    glVertex3d(0, 0.2, -DimBoard)
+    glTexCoord2f(1.0, 1.0)
+    glVertex3d(20, 0.2, -DimBoard)
+    glTexCoord2f(1.0, 0.0)
+    glVertex3d(20, 0.2, 0)
     glEnd()
     glDisable(GL_TEXTURE_2D)
 
