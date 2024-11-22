@@ -25,6 +25,7 @@ function agent_step!(agent::Lift, model)
             move_lift_to_box(agent, selected_box.pos, model)
         else
             println("No box available for agent $(agent.id) to carry.")
+            move_lift_to_end(agent, model)
         end
     else
         # If the lift is carrying a box, move towards the box's final position

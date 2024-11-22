@@ -74,6 +74,41 @@ function move_lift_and_box(lift, box, target_pos, model)
     end
 end
 
+function move_lift_to_end(lift, model)
+    #lift.pos = (div(model.container["width"], 2), 0, z)
+    # Calculate steps in y, z, and x
+    dy = sign(0 - lift.pos[2])
+    dz = sign(100 - lift.pos[3])
+    dx = sign(div(model.container["width"], 2) - lift.pos[1])
+
+    # Prioritize y movement first
+    if dy != 0
+        new_pos = (lift.pos[1], lift.pos[2] + dy, lift.pos[3])
+        if is_valid_position(new_pos, model)
+            lift.pos = new_pos
+            return
+        end
+    end
+
+    # Then prioritize z movement
+    if dz != 0
+        new_pos = (lift.pos[1], lift.pos[2], lift.pos[3] + dz)
+        if is_valid_position(new_pos, model)
+            lift.pos = new_pos
+            return
+        end
+    end
+
+    # Finally, prioritize x movement
+    if dx != 0
+        new_pos = (lift.pos[1] + dx, lift.pos[2], lift.pos[3])
+        if is_valid_position(new_pos, model)
+            lift.pos = new_pos
+            return
+        end
+    end
+end
+
 function is_valid_position(pos, model)
     # Verify if the new position is within model bounds
     in_bounds = all(pos .>= (0, 0, 0)) && all(pos .< model.griddims)
