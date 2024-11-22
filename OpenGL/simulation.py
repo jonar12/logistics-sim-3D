@@ -54,6 +54,8 @@ montacargas = []
 Wall = []
 Wall_Obj = []
 House = []
+House2 = []
+Car = []
 objetos = []
 
 # Realizar las llamadas a la API asíncronamente	
@@ -144,14 +146,22 @@ materiales = cargar_mtl(montacarga_mtl)
 materiales2 = cargar_mtl(building_mtl)
 
 # Otros materiales y objetos
-# casa_1_obj = pywavefront.Wavefront('./models_3D/houses/obj_House.obj', create_materials=True, collect_faces=True)
-# casa_1_mtl = './models_3D/houses/material.lib'
+casa_1_obj = pywavefront.Wavefront('./models_3D/building/bulding.obj', create_materials=True, collect_faces=True)
+casa_1_mtl = './models_3D/building/bulding.mtl'
+casa_2_obj = pywavefront.Wavefront('./models_3D/building/building2.obj', create_materials=True, collect_faces=True)
+casa_2_mtl = './models_3D/building/building2.mtl'
+#truck_obj = pywavefront.Wavefront('./models_3D/truck/minitruck.obj', create_materials=True, collect_faces=True)
+#truck_mtl = './models_3D/truck/minitruck.mtl'
 
 # Materiales y objetos
 ob = []
-# ob.append(casa_1_obj)
+ob.append(casa_1_obj)
+ob.append(casa_2_obj)
+##ob.append(truck_obj)
 mat = []
-# mat.append(cargar_mtl(casa_1_mtl))
+mat.append(cargar_mtl(casa_1_mtl))
+mat.append(cargar_mtl(casa_2_mtl))
+#mat.append(cargar_mtl(truck_mtl))
 
 def Axis():
     glShadeModel(GL_FLAT)
@@ -192,14 +202,21 @@ def Texturas(filepath):
 
 def Init():
     
-    # Pared frontal
+   # Pared frontal
     Wall.append([-40, -40, -40, DimBoard, False])
     Wall.append([-40, -40, DimBoard, -40, False])
     
     # Casa de prueba
-    House.append([-40, 0, 0])
+    #House.append([-40, 0, 0])
+    #House.append([-40, 0, 150])
+    House.append([-150, 30, -90])
+    House.append([-150, 10, 20])
     
-    House.append([-40, 0, 150])
+    House.append([-50, 10, -110])
+    
+    House2.append([-40, -45, 45])
+    House2.append([-30, 0, 150])
+    House2.append([110, 0, -40])
     
     #CREACION DE LOS OBJETOS INDICADOS
     for i in Wall:
@@ -222,8 +239,11 @@ def Init():
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
     
     #Creando a las casas
-    # for i in House:   
-    #     objetos.append(Comp(DimBoard, 1, i,  ob[0], mat[0], [10,10,10]))
+    for i in House:   
+        objetos.append(Comp(DimBoard, 1, i,  ob[0], mat[0], [0.1,0.1,0.1], 45))
+        
+    for i in House2:   
+        objetos.append(Comp(DimBoard, 1, i,  ob[1], mat[1], [10,10,10], 90))
     
     #w Texturas
     for i in filenames_objects:
@@ -276,12 +296,12 @@ def display(step):
         obj.draw()
     
     # Se dibuja las paredes
-    # for obj in Wall_Obj:
-    #     obj.drawCube(textures, 5) # 0 sky 1 void
+    for obj in Wall_Obj:
+        obj.drawCube(textures, 5) # 0 sky 1 void
         
     # Dibujar los montacargas
-    # for obj in objetos:
-    #     obj.draw()
+    for obj in objetos:
+       obj.draw()
 
     # Dibujar los objetos para decorar el ambiente
     for obj in ambiente_class:

@@ -90,7 +90,7 @@ class Walls:
         else:
             glBindTexture(GL_TEXTURE_2D, texture[id])
             
-        self.drawFace(self.x1, self.Up, self.z1, self.x1, 0, self.z1, self.x2, 0, self.z2, self.x2, self.Up, self.z2)
+        self.drawFace(self.x1, self.Up, self.z1, self.x1, -10, self.z1, self.x2, -10, self.z2, self.x2, self.Up, self.z2)
         if not self.jump:
             self.drawFace(self.x1, self.Up*2, self.z1, self.x1, self.Up, self.z1, self.x2, self.Up, self.z2, self.x2, self.Up*2, self.z2)
         """

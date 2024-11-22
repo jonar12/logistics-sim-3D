@@ -10,11 +10,11 @@ import random
 import math
 
 class Comp:
-    def __init__(self, dim, vel, pos, obj, materiales, esc):
+    def __init__(self, dim, vel, pos, obj, materiales, esc, deg):
         self.materiales = materiales
         self.dim = dim
         self.esc = esc
-        self.position = [pos[0], pos[1], pos[2]]
+        self.position = [pos[0], pos[1]-9, pos[2]]
         # self.position = [pos[0], 18.5, pos[2]]
         # self.position = [pos[0], 0, pos[2]]
         
@@ -22,7 +22,7 @@ class Comp:
         dirZ = random.randint(-1, 1) or 1
         magnitude = math.sqrt(dirX**2 + dirZ**2)
         self.Direction = [(dirX / magnitude), 0, (dirZ / magnitude)]
-        self.angle = 0
+        self.angle = deg
         self.vel = vel
         self.scene = obj
         self.platformHeight = -1.5
