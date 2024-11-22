@@ -11,7 +11,7 @@ function agent_step!(agent::Lift, model)
 
         if selected_box !== nothing
             # Move the lift toward the selected box
-            move_towards(agent, selected_box.pos, model)
+            move_lift_to_box(agent, selected_box.pos, model)
         else
             println("No box available for agent $(agent.id) to carry.")
         end
@@ -23,11 +23,10 @@ function agent_step!(agent::Lift, model)
         distance_to_box = euclidean_distance(agent.pos, box.pos)
         if distance_to_box < 1.0
             # Simultaneously move the lift and the box toward the box's final position
-            move_towards(agent, box.final_pos, model)
-            move_towards(box, box.final_pos, model)
+            move_lift_and_box(agent, box, box.final_pos, model)
         else
             # Move the lift closer to the box
-            move_towards(agent, box.pos, model)
+            move_lift_to_box(agent, box.pos, model)
         end
 
         # Check if the lift and box have reached the position of the truck entrance
