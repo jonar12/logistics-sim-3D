@@ -70,71 +70,68 @@ class Caja:
 
         glBegin(GL_QUADS)
 
-        # Definir un punto de referencia para el dibujado el cubo
-        x, y, z = 0, 0, 0
-
         # Dimensiones de la caja
         width, height, depth = self.body
 
         # Cara frontal
         glTexCoord2f(0.0, 0.0)
-        glVertex3f(x, y, z)
+        glVertex3f(0.0, 0.0, 0.0)
         glTexCoord2f(1.0, 0.0)
-        glVertex3f(x + width, y, z)
+        glVertex3f(width, 0.0, 0.0)
         glTexCoord2f(1.0, 1.0)
-        glVertex3f(x + width, y + height, z)
+        glVertex3f(width, height, 0.0)
         glTexCoord2f(0.0, 1.0)
-        glVertex3f(x, y + height, z)
+        glVertex3f(0.0, height, 0.0)
 
         # Cara trasera
         glTexCoord2f(0.0, 0.0)
-        glVertex3f(x, y, z + depth)
+        glVertex3f(0.0, 0.0, depth)
         glTexCoord2f(1.0, 0.0)
-        glVertex3f(x + width, y, z + depth)
+        glVertex3f(width, 0.0, depth)
         glTexCoord2f(1.0, 1.0)
-        glVertex3f(x + width, y + height, z + depth)
+        glVertex3f(width, height, depth)
         glTexCoord2f(0.0, 1.0)
-        glVertex3f(x, y + height, z + depth)
+        glVertex3f(0.0, height, depth)
 
-        # Cara izquierda
+        # Cara i0.0quierda
         glTexCoord2f(0.0, 0.0)
-        glVertex3f(x, y, z)
+        glVertex3f(0.0, 0.0, 0.0)
         glTexCoord2f(1.0, 0.0)
-        glVertex3f(x, y, z + depth)
+        glVertex3f(0.0, 0.0, depth)
         glTexCoord2f(1.0, 1.0)
-        glVertex3f(x, y + height, z + depth)
+        glVertex3f(0.0, height, depth)
         glTexCoord2f(0.0, 1.0)
-        glVertex3f(x, y + height, z)
+        glVertex3f(0.0, height, 0.0)
 
         # Cara derecha
         glTexCoord2f(0.0, 0.0)
-        glVertex3f(x + width, y, z)
+        glVertex3f(width, 0.0, 0.0)
         glTexCoord2f(1.0, 0.0)
-        glVertex3f(x + width, y, z + depth)
+        glVertex3f(width, 0.0, depth)
         glTexCoord2f(1.0, 1.0)
-        glVertex3f(x + width, y + height, z + depth)
+        glVertex3f(width, height, depth)
         glTexCoord2f(0.0, 1.0)
-        glVertex3f(x + width, y + height, z)
+        glVertex3f(width, height, 0.0)
 
         # Cara superior
         glTexCoord2f(0.0, 0.0)
-        glVertex3f(x, y + height, z)
+        glVertex3f(0.0, height, 0.0)
         glTexCoord2f(1.0, 0.0)
-        glVertex3f(x + width, y + height, z)
+        glVertex3f(width, height, 0.0)
         glTexCoord2f(1.0, 1.0)
-        glVertex3f(x + width, y + height, z + depth)
+        glVertex3f(width, height, depth)
         glTexCoord2f(0.0, 1.0)
-        glVertex3f(x, y + height, z + depth)
+        glVertex3f(0.0, height, depth)
 
         # Cara inferior
         glTexCoord2f(0.0, 0.0)
-        glVertex3f(x, y, z)
+        glVertex3f(0.0, 0.0, 0.0)
         glTexCoord2f(1.0, 0.0)
-        glVertex3f(x + width, y, z)
+        glVertex3f(width, 0.0, 0.0)
         glTexCoord2f(1.0, 1.0)
-        glVertex3f(x + width, y, z + depth)
+        glVertex3f(width, 0.0, depth)
         glTexCoord2f(0.0, 1.0)
-        glVertex3f(x, y, z + depth)
+        glVertex3f(0.0, 0.0, depth)
 
         glEnd()
         glPopMatrix()
