@@ -3,9 +3,10 @@ import requests # Permite enviar solicitudes HTTP
 from datetime import datetime
 import asyncio
 import aiohttp
+import trimesh
 
 import pywavefront
-from process_mtl import cargar_mtl
+from process_mtl import *
 
 import pygame
 from pygame.locals import *
@@ -23,10 +24,13 @@ from random import *
 from Montacarga import Montacarga
 from Fake_Compiler import Comp
 from Caja import Caja
-from Camion import Camion
+from Contenedor import Contenedor
 from Ambiente import Ambiente
-from PIL import ImageColor
+from PIL import Image, ImageColor
 from O_Wall import Walls
+
+# Inicializar Pygame
+pygame.init()
 
 # Llamada a la API
 URL_BASE = "http://localhost:8000"
@@ -64,7 +68,7 @@ objetos = []
 async def asynchronous_call():
     start_time = datetime.now()
     async with aiohttp.ClientSession() as session:
-        for _ in range(1500):
+        for _ in range(100):
             async with session.get(URL_BASE + LOCATION) as response:
                 response = await response.json()
 
@@ -87,7 +91,6 @@ async def asynchronous_call():
     print("Tiempo de ejecución:", end_time - start_time)
 
 asyncio.run(asynchronous_call())
-print("Caja:", cajas[0])
 # Definimos las dimensiones de la pantalla
 screen_width = 500
 screen_height = 500
@@ -115,7 +118,7 @@ Z_MIN=-500
 Z_MAX=500
 
 # Dimension del plano
-DimBoard = 200
+DimBoard = 220
 
 # Arreglos para el manejo de los objetos
 contenedor_class = []
@@ -140,34 +143,31 @@ montacarga_obj = pywavefront.Wavefront('./models_3D/Forklift.obj', create_materi
 montacarga_mtl = './models_3D/Forklift.mtl'
 
 # Cargamos los archivos .obj para decorar el ambiente
-building_obj = pywavefront.Wavefront('./models_3D/truck.obj', create_materials=True, collect_faces=True)
-building_mtl = './models_3D/truck.mtl'
+truck_obj = pywavefront.Wavefront('./models_3D/truck.obj', create_materials=True, collect_faces=True)
+truck_mtl = './models_3D/truck.mtl'
+
+# Cargamos archivos .obj 
+warehouse_obj = trimesh.load('./models_3D/warehouse.obj', force='scene')
+redContainer = trimesh.load('./models_3D/redContainer.obj', force='scene')
+box = trimesh.load('./models_3D/box.obj', force='scene')
 
 # Cargar materiales del archivo .mtl
 materiales = cargar_mtl(montacarga_mtl)
-materiales2 = cargar_mtl(building_mtl)
+materiales2 = cargar_mtl(truck_mtl)
 
 # Otros materiales y objetos
 casa_1_obj = pywavefront.Wavefront('./models_3D/building/bulding.obj', create_materials=True, collect_faces=True)
 casa_1_mtl = './models_3D/building/bulding.mtl'
 casa_2_obj = pywavefront.Wavefront('./models_3D/building/building2.obj', create_materials=True, collect_faces=True)
 casa_2_mtl = './models_3D/building/building2.mtl'
-casa_3_obj = pywavefront.Wavefront('./models_3D/building/shed.obj', create_materials=True, collect_faces=True)
-casa_3_mtl = './models_3D/building/shed.mtl'
-#truck_obj = pywavefront.Wavefront('./models_3D/truck/minitruck.obj', create_materials=True, collect_faces=True)
-#truck_mtl = './models_3D/truck/minitruck.mtl'
 
 # Materiales y objetos
 ob = []
 ob.append(casa_1_obj)
 ob.append(casa_2_obj)
-ob.append(casa_3_obj)
-##ob.append(truck_obj)
 mat = []
 mat.append(cargar_mtl(casa_1_mtl))
 mat.append(cargar_mtl(casa_2_mtl))
-mat.append(cargar_mtl(casa_3_mtl))
-#mat.append(cargar_mtl(truck_mtl))
 
 def Axis():
     glShadeModel(GL_FLAT)
@@ -206,6 +206,35 @@ def Texturas(filepath):
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, w, h, 0, GL_RGBA, GL_UNSIGNED_BYTE, image_data)
     glGenerateMipmap(GL_TEXTURE_2D)
 
+# Cargar cada textura del archivo .obj
+def cargar_textura(image_source):
+    img = image_source if isinstance(image_source, Image.Image) else Image.open(image_source)
+    
+    # Preparación de los datos de la textura
+    img_data = img.transpose(Image.FLIP_TOP_BOTTOM).convert("RGBA").tobytes()
+    width, height = img.size
+
+    # Genera y configura la textura
+    texture_id = glGenTextures(1)
+    glBindTexture(GL_TEXTURE_2D, texture_id)
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA, GL_UNSIGNED_BYTE, img_data)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR)
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR)
+
+    return texture_id
+
+# Cargar texturas de un archivo .obj que contiene imágenes
+def cargar_objeto_con_texturas(scene):
+    textures = {}
+    for geometry in scene.geometry.values():
+        material = geometry.visual.material
+        if material.image is not None:
+            # Se usa el nombre del material como clave   
+            textures[material.name] = cargar_textura(material.image)
+    return textures
+
 def Init():
     
    # Pared frontal
@@ -213,8 +242,6 @@ def Init():
     Wall.append([-40, -40, DimBoard, -40, False])
     
     # Casa de prueba
-    #House.append([-40, 0, 0])
-    #House.append([-40, 0, 150])
     House.append([-150, 30, -90])
     House.append([-150, 10, 20])
     
@@ -253,31 +280,49 @@ def Init():
         
     for i in House2:   
         objetos.append(Comp(DimBoard, 1, i,  ob[1], mat[1], [10,10,10], 90))
-        
-    for i in House3:   
-        objetos.append(Comp(DimBoard, 1, i,  ob[2], mat[2], [3,3,3], 90))
-    
+            
     #w Texturas
     for i in filenames_objects:
         Texturas(i)
+
+    # Cargar el objeto .obj de trimesh
+    texturas = cargar_objeto_con_texturas(warehouse_obj)
+    texturas2 = cargar_objeto_con_texturas(redContainer)
+    texturas3 = cargar_objeto_con_texturas(box)
     
     # Se crean los montacargas y las cajas por primera vez
     for i in range(len(montacargas[0])):
-        montacargas_class.append(Montacarga(DimBoard, 0.7, montacargas[0][i]["pos"], montacarga_obj, materiales))
+        montacargas_class.append(Montacarga(DimBoard, 0.7, montacargas[0][i]["pos"], 180, montacarga_obj, materiales))
         
     for i in range(len(cajas[0])):
         cajas_class.append(Caja(DimBoard, 1, textures, 3, cajas[0][i]["pos"], cajas[0][i]["WHD"], cajas[0][i]["color"]))
 
     # Se crea el contenedor
-    contenedor_class.append(Camion([depth, height, width], [0, 0, 0], container_color))
+    contenedor_class.append(Contenedor([width, height, depth], [0, 0, 0], container_color))
 
     # Crear el objetos para decorar el ambiente
-    # ambiente_class.append(Ambiente([10.0, 5.0, -20.0], [3.0, 3.0, 3.0], building_obj, materiales2, 90, [0.0, 1.0, 0.0]))
-    ambiente_class.append(Ambiente([11.4, 8.9, -13.0], [1.6, 3.0, 3.0], building_obj, materiales2, 90, [0.0, 1.0, 0.0]))
+    ambiente_class.append(Ambiente([7.3, 8.9, -7.0], [1.6, 3.0, 3.0], truck_obj, 90.0, [0.0, 1.0, 0.0], materiales=materiales2))
 
-def display(step):
+    ambiente_class.append(Ambiente([150.0, -8.9, 70.0], [2.0, 2.0, 2.0], warehouse_obj, -90.0, [0.0, 1.0, 0.0], textures=texturas))
+
+    ambiente_class.append(Ambiente([150.0, -8.5, 130.0], [10.0, 10.0, 10.0], redContainer, -90.0, [0.0, 1.0, 0.0], textures=texturas2))
+
+    ambiente_class.append(Ambiente([150.0, -8.5, 155.0], [10.0, 10.0, 10.0], redContainer, -90.0, [0.0, 1.0, 0.0], textures=texturas2))
+
+    ambiente_class.append(Ambiente([150.0, 15.4, 142.5], [10.0, 10.0, 10.0], redContainer, -90.0, [0.0, 1.0, 0.0], textures=texturas2))
+
+    ambiente_class.append(Ambiente([200.0, -8.5, 105.0], [0.1, 0.1, 0.1], box, -90.0, [0.0, 1.0, 0.0], textures=texturas3))
+
+    ambiente_class.append(Ambiente([180.0, -8.5, 105.0], [0.1, 0.1, 0.1], box, -90.0, [0.0, 1.0, 0.0], textures=texturas3))
+
+    ambiente_class.append(Ambiente([200.0, -8.5, 85.0], [0.1, 0.1, 0.1], box, -90.0, [0.0, 1.0, 0.0], textures=texturas3))
+
+def update_simulation(step):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
+
+    # Dibujar los ejes del sistema
     Axis()
+
     #Se dibuja el plano gris
     glColor3f(0.53, 0.81, 0.92)
     glBegin(GL_QUADS)
@@ -433,6 +478,7 @@ done = False
 
 # Pasos de simulación
 simulation_step = 0
+
 while not done:
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:
@@ -448,10 +494,8 @@ while not done:
     glLoadIdentity() # Cargamos la matriz identidad para limpiar la matriz de modelado
     gluLookAt(EYE_X, EYE_Y, EYE_Z, CENTER_X, CENTER_Y, CENTER_Z, UP_X, UP_Y, UP_Z)
 
-    # Actualizar objetos por cada segundo
-    display(simulation_step)
+    update_simulation(simulation_step)
     simulation_step += 1
-    Axis()
 
     pygame.display.flip()
     pygame.time.wait(10)

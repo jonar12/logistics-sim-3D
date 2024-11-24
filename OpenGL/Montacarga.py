@@ -10,7 +10,7 @@ import random
 import math
 
 class Montacarga:
-    def __init__(self, dim, vel, pos, obj, materiales):
+    def __init__(self, dim, vel, pos, angle, obj, materiales):
         self.materiales = materiales
         self.dim = dim
         self.position = [pos[0], 0, pos[2]]
@@ -21,7 +21,7 @@ class Montacarga:
         dirZ = random.randint(-1, 1) or 1
         magnitude = math.sqrt(dirX**2 + dirZ**2)
         self.Direction = [(dirX / magnitude), 0, (dirZ / magnitude)]
-        self.angle = 180
+        self.angle = angle
         self.vel = vel
         self.scene = obj
         self.platformHeight = -1.5
