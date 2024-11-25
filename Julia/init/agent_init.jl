@@ -14,7 +14,7 @@ function initialize_lifts(model, n_lifts=1, spacing=10)
 end
 
 function initialize_boxes(boxes, model, padding=1)
-    z = model.container["depth"] + 10
+    z = model.container["depth"] + 40
 
     for box in boxes
         # Crear agente Box
@@ -22,7 +22,7 @@ function initialize_boxes(boxes, model, padding=1)
 
         # Inicializar propiedades del agente Box
         box_agent.WHD = rotate_box(box["rotation_type"], box["width"], box["height"], box["depth"])
-        box_agent.pos = (model.container["width"] + 10, 0, z)
+        box_agent.pos = (model.container["width"] + 120, 0, z)
         box_agent.final_pos = Tuple(box["position"])
         box_agent.color = random_hex_color()
 

@@ -41,7 +41,7 @@ function agent_step!(agent::Lift, model)
         end
 
         # Check if the lift and box have reached the position of the truck entrance
-        if agent.pos[3] <= model.container["depth"] && box.pos[3] <= model.container["depth"]
+        if agent.pos[3] <= model.container["depth"] + 20 && box.pos[3] <= model.container["depth"] + 20
             println("Agent $(agent.id) delivered box $(box.id) to its final position.")
             box.pos = box.final_pos
             agent.carrying_box = nothing
