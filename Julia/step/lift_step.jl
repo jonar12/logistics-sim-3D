@@ -34,7 +34,7 @@ function agent_step!(agent::Lift, model)
         distance_to_box = euclidean_distance(agent.pos, box.pos)
         if distance_to_box < 1.0 # AQUI cambiar distancia de montacargas-caja para el inicio del cargado
             # Mark the box as being carried
-            box.carrying_box.is_being_carried = true
+            box.is_being_carried = true
             # Simultaneously move the lift and the box toward the box's final position
             move_lift_and_box(agent, box, box.final_pos, model)
         else
