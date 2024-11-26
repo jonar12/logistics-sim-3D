@@ -12,6 +12,8 @@ class Caja:
         self.final_pos = final_pos
         self.body = body
         self.color = color
+        self.is_being_carried = False
+        self.angle = 0 # Ángulo de rotación de la caja
 
     def returnToFinalPosition(self):
         initialPosX, _, initialPosZ = self.position
@@ -20,10 +22,20 @@ class Caja:
             self.position = self.final_pos
 
     def setPosition(self, pos):
-        self.position = [pos[0], -6.5, pos[2]]
+        self.position = [pos[0], -8.5, pos[2]]
 
     def getPosition(self):
         return self.position
+    
+    def setBeingCarried(self, is_being_carried):
+        self.is_being_carried = is_being_carried
+    
+    def update_position_y(self):
+        if self.is_being_carried:
+            self.position[1] = -5.0
+
+    def setAngle(self, angle):
+        self.angle = angle
 
     def draw(self):
         glPushMatrix()

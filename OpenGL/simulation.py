@@ -61,14 +61,13 @@ Wall_Obj = []
 House = []
 House2 = []
 House3 = []
-Car = []
 objetos = []
 
 # Realizar las llamadas a la API asíncronamente	
 async def asynchronous_call():
     start_time = datetime.now()
     async with aiohttp.ClientSession() as session:
-        for _ in range(1):
+        for _ in range(4000):
             async with session.get(URL_BASE + LOCATION) as response:
                 response = await response.json()
 
@@ -334,9 +333,6 @@ def Init():
 
     ambiente_class.append(Ambiente([207, 1.7, 100.0], [13.0, 13.0, 13.0], platform, 70.0, [0.0, 0.0, 1.0], textures=texturas4))
 
-
-
-
 def update_simulation(step):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
@@ -358,15 +354,15 @@ def update_simulation(step):
     rotation_completed = True
 
     if step < len(montacargas) - 1:
-        print("Step:", step)
-        print("Montacarga:", montacargas[step])
+        # print("Step:", step)
+        # print("Montacarga:", montacargas[step])
 
-        for cont, montacarga_data in enumerate(montacargas[step]):
+        for montacarga_data in montacargas[step]:
             angle_rad = 0.0
             pos = montacarga_data["pos"]
 
             if step > 0:
-                previous_pos = montacargas[step + 1][cont]["pos"]
+                previous_pos = montacargas[step + 1][0]["pos"]
                 delta_x = pos[0] - previous_pos[0]
                 delta_z = pos[2] - previous_pos[2]
 
@@ -384,9 +380,9 @@ def update_simulation(step):
                     angle_rad = 180.0
 
                 # Si el montacarga no está rotando, actualizar la posición y el ángulo objetivo
-                if not montacargas_class[cont].isRotating():
-                    montacargas_class[cont].setTargetAngle(angle_rad)
-                    montacargas_class[cont].setPosition(pos)
+                if not montacargas_class[0].isRotating():
+                    montacargas_class[0].setTargetAngle(angle_rad)
+                    montacargas_class[0].setPosition(pos)
                 else:
                     rotation_completed = False
 
@@ -394,7 +390,10 @@ def update_simulation(step):
     if rotation_completed and step < len(cajas):
         for cont, caja in enumerate(cajas[step]):
             pos = caja["pos"]
+            is_being_carried = caja["is_being_carried"]
+            cajas_class[cont].setBeingCarried(is_being_carried)
             cajas_class[cont].setPosition(pos)
+            cajas_class[cont].update_position_y()
 
     # Dibujar los montacargas
     for obj in montacargas_class:
@@ -443,25 +442,25 @@ def update_simulation(step):
     glBindTexture(GL_TEXTURE_2D, textures[6])
     glBegin(GL_QUADS)
     glTexCoord2f(0.0, 0.0)
-    glVertex3d(-10.5, -8.8, 0)
+    glVertex3d(-13.5, -8.8, 0)
     glTexCoord2f(0.0, 1.0)
-    glVertex3d(-10.5, -8.8, DimBoard)
+    glVertex3d(-13.5, -8.8, DimBoard)
     glTexCoord2f(1.0, 1.0)
-    glVertex3d(33.0, -8.8, DimBoard)
+    glVertex3d(28.0, -8.8, DimBoard)
     glTexCoord2f(1.0, 0.0)
-    glVertex3d(33.0, -8.8, 0)
+    glVertex3d(28.0, -8.8, 0)
     glEnd()
 
     glBindTexture(GL_TEXTURE_2D, textures[6])
     glBegin(GL_QUADS)
     glTexCoord2f(0.0, 0.0)
-    glVertex3d(-10.5, -8.8, 0)
+    glVertex3d(-13.5, -8.8, 0)
     glTexCoord2f(0.0, 1.0)
-    glVertex3d(-10.5, -8.8, -DimBoard)
+    glVertex3d(-13.5, -8.8, -DimBoard)
     glTexCoord2f(1.0, 1.0)
-    glVertex3d(33.0, -8.8, -DimBoard)
+    glVertex3d(28.0, -8.8, -DimBoard)
     glTexCoord2f(1.0, 0.0)
-    glVertex3d(33.0, -8.8, 0)
+    glVertex3d(28.0, -8.8, 0)
     glEnd()
     glDisable(GL_TEXTURE_2D)
 
