@@ -14,6 +14,7 @@ class Caja:
         self.color = color
         self.is_being_carried = False
         self.angle = 0 # Ángulo de rotación de la caja
+        self.angle_montacarga = 0
 
     def returnToFinalPosition(self):
         initialPosX, _, initialPosZ = self.position
@@ -27,19 +28,31 @@ class Caja:
     def getPosition(self):
         return self.position
     
-    def setBeingCarried(self, is_being_carried):
+    def setBeingCarried(self, is_being_carried, angle_montacarga=None):
         self.is_being_carried = is_being_carried
+        self.angle_montacarga = angle_montacarga
     
     def update_position_y(self):
         if self.is_being_carried:
-            self.position[1] = -5.0
+            self.position[1] = -5.6
 
     def setAngle(self, angle):
         self.angle = angle
-
+    
     def draw(self):
         glPushMatrix()
         glTranslatef(self.position[0], self.position[1], self.position[2])
+        if self.is_being_carried and self.angle_montacarga is not None:
+            glRotatef(self.angle_montacarga, 0.0, 1.0, 0.0)
+
+        # Dibujamos la caja
+        self.drawBox()
+
+        glPopMatrix()
+
+    def drawBox(self):
+        glPushMatrix()
+        glTranslatef(-1.1, 0.0, 5.0)
         glColor3f(*self.color)
 
         glBegin(GL_QUADS)
