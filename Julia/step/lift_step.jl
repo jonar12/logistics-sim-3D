@@ -32,7 +32,9 @@ function agent_step!(agent::Lift, model)
 
         # Check if the lift is close enough to the box to begin simultaneous movement
         distance_to_box = euclidean_distance(agent.pos, box.pos)
-        if distance_to_box < 1.0
+        if distance_to_box < 1.0 # AQUI cambiar distancia de montacargas-caja para el inicio del cargado
+            # Mark the box as being carried
+            box.carrying_box.is_being_carried = true
             # Simultaneously move the lift and the box toward the box's final position
             move_lift_and_box(agent, box, box.final_pos, model)
         else
@@ -41,7 +43,7 @@ function agent_step!(agent::Lift, model)
         end
 
         # Check if the lift and box have reached the position of the truck entrance
-        if agent.pos[3] <= model.container["depth"] && box.pos[3] <= model.container["depth"]
+        if agent.pos[3] <= model.container["depth"] + 10 && box.pos[3] <= model.container["depth"] + 10
             println("Agent $(agent.id) delivered box $(box.id) to its final position.")
             box.pos = box.final_pos
             agent.carrying_box = nothing
