@@ -1,4 +1,3 @@
-import pygame
 from pygame.locals import *
 
 # Cargamos las bibliotecas de OpenGL
@@ -6,62 +5,25 @@ from OpenGL.GL import *
 from OpenGL.GLU import *
 from OpenGL.GLUT import *
 
-import random
-import math
-
-
 class Caja:
-    def __init__(self, dim, vel, textures, txtIndex, pos, body, color):
+    def __init__(self, pos, final_pos, body, color):
         # Se inicializa las coordenadas de los vertices del cubo
-        self.color = color
+        self.position = [pos[0], -8.5, pos[2]]
+        self.final_pos = final_pos
         self.body = body
+        self.color = color
 
-        self.dim = dim
-        self.position = [pos[0], 0, pos[2]]
+    def returnToFinalPosition(self):
+        initialPosX, _, initialPosZ = self.position
+        finalPosX, _, finalPosZ = self.final_pos
+        if initialPosX == finalPosX and initialPosZ  == finalPosZ:
+            self.position = self.final_pos
 
-        # Inicializar las coordenadas (x,y,z) del cubo en el tablero
-        # almacenandolas en el vector position
-        # ...
-        # Se inicializa un vector de direccion aleatorio
-        dirX = random.randint(-10, 10) or 1
-        dirZ = random.randint(-1, 1) or 1
-        magnitude = math.sqrt(dirX * dirX + dirZ * dirZ) * vel
-        self.direction = [dirX / magnitude, 0, dirZ / magnitude]
-        # El vector aleatorio debe de estar sobre el plano XZ (la altura en Y debe ser fija)
-        # Se normaliza el vector de direccion
-        # ...
-        # Se cambia la maginitud del vector direccion con la variable vel
-        # ...
-        
-        #Arreglo de texturas
-        self.textures = textures
-
-        #Index de la textura a utilizar
-        self.txtIndex = txtIndex
-
-        #Control variable for drawing
-        self.alive = True
-
-    # def update(self):
-    #     # Se debe de calcular la posible nueva posicion del cubo a partir de su
-    #     # posicion acutual (position) y el vector de direccion (direction)
-    #     # ...
-    #     newX = self.position[0] + self.direction[0]
-    #     newZ = self.position[2] + self.direction[2]
-    #     if newX < -self.dim or newX > self.dim:
-    #         self.direction[0] *= -1
-    #     else:
-    #         self.position[0] = newX
-    #     if newZ < -self.dim or newZ > self.dim:
-    #         self.direction[2] *= -1
-    #     else:
-    #         self.position[2] = newZ
-
-        # Se debe verificar que el objeto cubo, con su nueva posible direccion
-        # no se salga del plano actual (DimBoard)
-        # ...
     def setPosition(self, pos):
-        self.position = pos
+        self.position = [pos[0], -6.5, pos[2]]
+
+    def getPosition(self):
+        return self.position
 
     def draw(self):
         glPushMatrix()

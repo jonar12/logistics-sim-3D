@@ -1,5 +1,4 @@
 from pygame.locals import *
-from Cubo import Cubo
 
 # Cargamos las bibliotecas de OpenGL
 from OpenGL.GL import *

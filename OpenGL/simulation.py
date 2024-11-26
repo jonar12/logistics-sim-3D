@@ -68,7 +68,7 @@ objetos = []
 async def asynchronous_call():
     start_time = datetime.now()
     async with aiohttp.ClientSession() as session:
-        for _ in range(100):
+        for _ in range(1):
             async with session.get(URL_BASE + LOCATION) as response:
                 response = await response.json()
 
@@ -91,6 +91,7 @@ async def asynchronous_call():
     print("Tiempo de ejecución:", end_time - start_time)
 
 asyncio.run(asynchronous_call())
+
 # Definimos las dimensiones de la pantalla
 screen_width = 500
 screen_height = 500
@@ -118,7 +119,7 @@ Z_MIN=-500
 Z_MAX=500
 
 # Dimension del plano
-DimBoard = 220
+DimBoard = 240
 
 # Arreglos para el manejo de los objetos
 contenedor_class = []
@@ -150,6 +151,7 @@ truck_mtl = './models_3D/truck.mtl'
 warehouse_obj = trimesh.load('./models_3D/warehouse.obj', force='scene')
 redContainer = trimesh.load('./models_3D/redContainer.obj', force='scene')
 box = trimesh.load('./models_3D/box.obj', force='scene')
+platform = trimesh.load('./models_3D/platform.obj', force='scene')
 
 # Cargar materiales del archivo .mtl
 materiales = cargar_mtl(montacarga_mtl)
@@ -289,13 +291,14 @@ def Init():
     texturas = cargar_objeto_con_texturas(warehouse_obj)
     texturas2 = cargar_objeto_con_texturas(redContainer)
     texturas3 = cargar_objeto_con_texturas(box)
+    texturas4 = cargar_objeto_con_texturas(platform)
     
     # Se crean los montacargas y las cajas por primera vez
     for i in range(len(montacargas[0])):
-        montacargas_class.append(Montacarga(DimBoard, 0.7, montacargas[0][i]["pos"], 180, montacarga_obj, materiales))
+        montacargas_class.append(Montacarga(montacargas[0][i]["pos"], 180, montacarga_obj, materiales))
         
     for i in range(len(cajas[0])):
-        cajas_class.append(Caja(DimBoard, 1, textures, 3, cajas[0][i]["pos"], cajas[0][i]["WHD"], cajas[0][i]["color"]))
+        cajas_class.append(Caja(cajas[0][i]["pos"], cajas[0][i]["final_pos"], cajas[0][i]["WHD"], cajas[0][i]["color"]))
 
     # Se crea el contenedor
     contenedor_class.append(Contenedor([width, height, depth], [0, 0, 0], container_color))
@@ -303,19 +306,36 @@ def Init():
     # Crear el objetos para decorar el ambiente
     ambiente_class.append(Ambiente([7.3, 8.9, -7.0], [1.6, 3.0, 3.0], truck_obj, 90.0, [0.0, 1.0, 0.0], materiales=materiales2))
 
-    ambiente_class.append(Ambiente([150.0, -8.9, 70.0], [2.0, 2.0, 2.0], warehouse_obj, -90.0, [0.0, 1.0, 0.0], textures=texturas))
+    ambiente_class.append(Ambiente([150.0, -8.9, 90.0], [3.5, 2.0, 2.0], warehouse_obj, -90.0, [0.0, 1.0, 0.0], textures=texturas))
 
-    ambiente_class.append(Ambiente([150.0, -8.5, 130.0], [10.0, 10.0, 10.0], redContainer, -90.0, [0.0, 1.0, 0.0], textures=texturas2))
+    ambiente_class.append(Ambiente([135.0, -8.5, 185.0], [10.0, 10.0, 10.0], redContainer, -90.0, [0.0, 1.0, 0.0], textures=texturas2))
 
-    ambiente_class.append(Ambiente([150.0, -8.5, 155.0], [10.0, 10.0, 10.0], redContainer, -90.0, [0.0, 1.0, 0.0], textures=texturas2))
+    ambiente_class.append(Ambiente([135.0, -8.5, 210.0], [10.0, 10.0, 10.0], redContainer, -90.0, [0.0, 1.0, 0.0], textures=texturas2))
 
-    ambiente_class.append(Ambiente([150.0, 15.4, 142.5], [10.0, 10.0, 10.0], redContainer, -90.0, [0.0, 1.0, 0.0], textures=texturas2))
+    ambiente_class.append(Ambiente([135.0, 15.4, 197.5], [10.0, 10.0, 10.0], redContainer, -90.0, [0.0, 1.0, 0.0], textures=texturas2))
 
-    ambiente_class.append(Ambiente([200.0, -8.5, 105.0], [0.1, 0.1, 0.1], box, -90.0, [0.0, 1.0, 0.0], textures=texturas3))
+    ambiente_class.append(Ambiente([200.0, -8.5, 160.0], [0.1, 0.1, 0.1], box, -90.0, [0.0, 1.0, 0.0], textures=texturas3))
 
-    ambiente_class.append(Ambiente([180.0, -8.5, 105.0], [0.1, 0.1, 0.1], box, -90.0, [0.0, 1.0, 0.0], textures=texturas3))
+    ambiente_class.append(Ambiente([200.0, -8.5, 140.0], [0.1, 0.1, 0.1], box, -90.0, [0.0, 1.0, 0.0], textures=texturas3))
 
-    ambiente_class.append(Ambiente([200.0, -8.5, 85.0], [0.1, 0.1, 0.1], box, -90.0, [0.0, 1.0, 0.0], textures=texturas3))
+    ambiente_class.append(Ambiente([180.0, -8.5, 160.0], [0.07, 0.07, 0.07], box, -90.0, [0.0, 1.0, 0.0], textures=texturas3))
+
+    ambiente_class.append(Ambiente([165.0, -8.5, 160.0], [0.07, 0.07, 0.07], box, -90.0, [0.0, 1.0, 0.0], textures=texturas3))
+
+    ambiente_class.append(Ambiente([170.5, 2.0, 160.0], [0.07, 0.07, 0.07], box, -90.0, [0.0, 1.0, 0.0], textures=texturas3))
+
+    ambiente_class.append(Ambiente([135.0, -6.2, 155.0], [13.0, 13.0, 13.0], platform, -90.0, [0.0, 1.0, 0.0], textures=texturas4))
+
+    ambiente_class.append(Ambiente([133.0, -9.0, 152.0], [13.0, 13.0, 13.0], platform, 90.0, [0.0, 1.0, 0.0], textures=texturas4))
+
+    ambiente_class.append(Ambiente([135.0, -4.0, 153.5], [13.0, 13.0, 13.0], platform, -90.0, [0.0, 1.0, 0.0], textures=texturas4))
+
+    ambiente_class.append(Ambiente([126.5, -2.0, 153.5], [13.0, 13.0, 13.0], platform, 38.0, [0.0, 0.0, 1.0], textures=texturas4))
+
+    ambiente_class.append(Ambiente([207, 1.7, 100.0], [13.0, 13.0, 13.0], platform, 70.0, [0.0, 0.0, 1.0], textures=texturas4))
+
+
+
 
 def update_simulation(step):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -331,29 +351,59 @@ def update_simulation(step):
     glVertex3d(sky, 300, sky)
     glVertex3d(sky, 300, -sky)
     glEnd()
+
     # Se actualizan los datos de los objetos
 
     # Actualizar la posición de los montacargas
-    if step < len(montacargas):
-        print("Step:", step)
-        for cont, montacarga in enumerate(montacargas[step]):
-            print("Montacarga:", cont)
-            pos = montacarga["pos"]
-            print("Posición:", pos)
-            montacargas_class[cont].setPosition(pos)
+    rotation_completed = True
 
-    # Actualizar la posición de las cajas
-    if step < len(cajas):
+    if step < len(montacargas) - 1:
+        print("Step:", step)
+        print("Montacarga:", montacargas[step])
+
+        for cont, montacarga_data in enumerate(montacargas[step]):
+            angle_rad = 0.0
+            pos = montacarga_data["pos"]
+
+            if step > 0:
+                previous_pos = montacargas[step + 1][cont]["pos"]
+                delta_x = pos[0] - previous_pos[0]
+                delta_z = pos[2] - previous_pos[2]
+
+                # Calcular el ángulo objetivo
+                if delta_x < 0:
+                    angle_rad = 90.0
+
+                if delta_x > 0:
+                    angle_rad = 270.0
+
+                if delta_z < 0:
+                    angle_rad = 0.0
+
+                if delta_z > 0:
+                    angle_rad = 180.0
+
+                # Si el montacarga no está rotando, actualizar la posición y el ángulo objetivo
+                if not montacargas_class[cont].isRotating():
+                    montacargas_class[cont].setTargetAngle(angle_rad)
+                    montacargas_class[cont].setPosition(pos)
+                else:
+                    rotation_completed = False
+
+    # Actualizar la posición de las cajas solo si la rotación del montacarga ha terminado
+    if rotation_completed and step < len(cajas):
         for cont, caja in enumerate(cajas[step]):
             pos = caja["pos"]
             cajas_class[cont].setPosition(pos)
 
     # Dibujar los montacargas
     for obj in montacargas_class:
+        obj.update()
         obj.draw()
     
     # Se dibujan las cajas
     for obj in cajas_class:
+        obj.returnToFinalPosition()
         obj.draw()
 
     # Se dibuja el contenedor
@@ -362,7 +412,7 @@ def update_simulation(step):
     
     # Se dibuja las paredes
     for obj in Wall_Obj:
-        obj.drawCube(textures, 5) # 0 sky 1 void
+        obj.drawCube(textures, 5)
         
     # Dibujar los montacargas
     for obj in objetos:
@@ -415,6 +465,8 @@ def update_simulation(step):
     glEnd()
     glDisable(GL_TEXTURE_2D)
 
+    return rotation_completed
+
 # Manipulación de la posición del observador
 speed_movement = 1.0
 def handleMovement(keys):
@@ -431,6 +483,7 @@ def handleMovement(keys):
     if keys[pygame.K_w]:
         EYE_X += dir_x * speed_movement
         EYE_Z += dir_z * speed_movement
+
     if keys[pygame.K_s]:
         EYE_X -= dir_x * speed_movement
         EYE_Z -= dir_z * speed_movement
@@ -444,19 +497,19 @@ def handleMovement(keys):
         EYE_X -= dir_z * speed_movement
         EYE_Z += dir_x * speed_movement
         
-
     # Movimiento vertical (Flechas arriba y abajo)
     if keys[pygame.K_UP]:
         if EYE_Y < 500:
             EYE_Y += speed_movement
 
     if keys[pygame.K_DOWN]:
-        if EYE_Y > 0:
-            EYE_Y -= speed_movement
+        # if EYE_Y > 0:
+        EYE_Y -= speed_movement
 
     # Rotación izquierda y derecha (Flechas izquierda y derecha)
     if keys[pygame.K_LEFT]:
         theta -= speed_movement  # Rotar a la izquierda
+
     if keys[pygame.K_RIGHT]:
         theta += speed_movement  # Rotar a la derecha
 
@@ -494,8 +547,9 @@ while not done:
     glLoadIdentity() # Cargamos la matriz identidad para limpiar la matriz de modelado
     gluLookAt(EYE_X, EYE_Y, EYE_Z, CENTER_X, CENTER_Y, CENTER_Z, UP_X, UP_Y, UP_Z)
 
-    update_simulation(simulation_step)
-    simulation_step += 1
+    rotation_completed = update_simulation(simulation_step)
+    if rotation_completed:
+        simulation_step += 1
 
     pygame.display.flip()
     pygame.time.wait(10)
