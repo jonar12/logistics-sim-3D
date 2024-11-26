@@ -36,6 +36,9 @@ class Montacarga:
         # El montacarga está rotando
         self.is_rotating = True
 
+    def getAngle(self):
+        return self.angle
+
     def update(self):
         angle_diff = (self.target_angle - self.angle + 180) % 360 - 180
 

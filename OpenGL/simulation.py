@@ -354,9 +354,6 @@ def update_simulation(step):
     rotation_completed = True
 
     if step < len(montacargas) - 1:
-        # print("Step:", step)
-        # print("Montacarga:", montacargas[step])
-
         for montacarga_data in montacargas[step]:
             angle_rad = 0.0
             pos = montacarga_data["pos"]
@@ -387,11 +384,19 @@ def update_simulation(step):
                     rotation_completed = False
 
     # Actualizar la posición de las cajas solo si la rotación del montacarga ha terminado
-    if rotation_completed and step < len(cajas):
+    if step < len(cajas):
         for cont, caja in enumerate(cajas[step]):
             pos = caja["pos"]
             is_being_carried = caja["is_being_carried"]
-            cajas_class[cont].setBeingCarried(is_being_carried)
+
+            if is_being_carried:
+                
+                # Obtener el ángulo del montacarga
+                angle_montacarga = montacargas_class[0].getAngle()
+                cajas_class[cont].setBeingCarried(True, angle_montacarga)
+            else:
+                cajas_class[cont].setBeingCarried(False)
+
             cajas_class[cont].setPosition(pos)
             cajas_class[cont].update_position_y()
 
