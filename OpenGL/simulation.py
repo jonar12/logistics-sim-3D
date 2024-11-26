@@ -119,7 +119,7 @@ Z_MIN=-500
 Z_MAX=500
 
 # Dimension del plano
-DimBoard = 220
+DimBoard = 240
 
 # Arreglos para el manejo de los objetos
 contenedor_class = []
@@ -151,6 +151,7 @@ truck_mtl = './models_3D/truck.mtl'
 warehouse_obj = trimesh.load('./models_3D/warehouse.obj', force='scene')
 redContainer = trimesh.load('./models_3D/redContainer.obj', force='scene')
 box = trimesh.load('./models_3D/box.obj', force='scene')
+platform = trimesh.load('./models_3D/platform.obj', force='scene')
 
 # Cargar materiales del archivo .mtl
 materiales = cargar_mtl(montacarga_mtl)
@@ -290,6 +291,7 @@ def Init():
     texturas = cargar_objeto_con_texturas(warehouse_obj)
     texturas2 = cargar_objeto_con_texturas(redContainer)
     texturas3 = cargar_objeto_con_texturas(box)
+    texturas4 = cargar_objeto_con_texturas(platform)
     
     # Se crean los montacargas y las cajas por primera vez
     for i in range(len(montacargas[0])):
@@ -321,6 +323,17 @@ def Init():
     ambiente_class.append(Ambiente([165.0, -8.5, 160.0], [0.07, 0.07, 0.07], box, -90.0, [0.0, 1.0, 0.0], textures=texturas3))
 
     ambiente_class.append(Ambiente([170.5, 2.0, 160.0], [0.07, 0.07, 0.07], box, -90.0, [0.0, 1.0, 0.0], textures=texturas3))
+
+    ambiente_class.append(Ambiente([135.0, -6.2, 155.0], [13.0, 13.0, 13.0], platform, -90.0, [0.0, 1.0, 0.0], textures=texturas4))
+
+    ambiente_class.append(Ambiente([133.0, -9.0, 152.0], [13.0, 13.0, 13.0], platform, 90.0, [0.0, 1.0, 0.0], textures=texturas4))
+
+    ambiente_class.append(Ambiente([135.0, -4.0, 153.5], [13.0, 13.0, 13.0], platform, -90.0, [0.0, 1.0, 0.0], textures=texturas4))
+
+    ambiente_class.append(Ambiente([126.5, -2.0, 153.5], [13.0, 13.0, 13.0], platform, 38.0, [0.0, 0.0, 1.0], textures=texturas4))
+
+    ambiente_class.append(Ambiente([207, 1.7, 100.0], [13.0, 13.0, 13.0], platform, 70.0, [0.0, 0.0, 1.0], textures=texturas4))
+
 
 
 

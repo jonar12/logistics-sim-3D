@@ -1,0 +1,14 @@
+# Blender 3.6.1 MTL File: 'epal_exported.blend'
+# www.blender.org
+
+newmtl epal
+Ka 1.000000 1.000000 1.000000
+Ks 0.500000 0.500000 0.500000
+Ni 1.450000
+d 1.000000
+illum 2
+map_Kd ../textures/texture1.png
+map_Ns ../textures/texture2.png
+map_refl ../textures/texture3.png
+map_Ke ../textures/texture4.png
+map_Bump -bm 1.000000 ../textures/texture5.png
