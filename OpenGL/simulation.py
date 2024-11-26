@@ -151,6 +151,7 @@ warehouse_obj = trimesh.load('./models_3D/warehouse.obj', force='scene')
 redContainer = trimesh.load('./models_3D/redContainer.obj', force='scene')
 box = trimesh.load('./models_3D/box.obj', force='scene')
 platform = trimesh.load('./models_3D/platform.obj', force='scene')
+yellow_protractor = trimesh.load('./models_3D/yellow_protractor.obj', force='scene')
 
 # Cargar materiales del archivo .mtl
 materiales = cargar_mtl(montacarga_mtl)
@@ -291,6 +292,7 @@ def Init():
     texturas2 = cargar_objeto_con_texturas(redContainer)
     texturas3 = cargar_objeto_con_texturas(box)
     texturas4 = cargar_objeto_con_texturas(platform)
+    texturas5 = cargar_objeto_con_texturas(yellow_protractor)
     
     # Se crean los montacargas y las cajas por primera vez
     for i in range(len(montacargas[0])):
@@ -331,7 +333,12 @@ def Init():
 
     ambiente_class.append(Ambiente([126.5, -2.0, 153.5], [13.0, 13.0, 13.0], platform, 38.0, [0.0, 0.0, 1.0], textures=texturas4))
 
-    ambiente_class.append(Ambiente([207, 1.7, 100.0], [13.0, 13.0, 13.0], platform, 70.0, [0.0, 0.0, 1.0], textures=texturas4))
+    ambiente_class.append(Ambiente([207.0, 1.7, 100.0], [13.0, 13.0, 13.0], platform, 70.0, [0.0, 0.0, 1.0], textures=texturas4))
+
+    ambiente_class.append(Ambiente([200.0, -8.9, 20.0], [0.15, 0.15, 0.15], yellow_protractor, 180.0, [0.0, 1.0, 0.0], textures=texturas5))
+
+    ambiente_class.append(Ambiente([200.0, -8.9, 35.0], [0.15, 0.15, 0.15], yellow_protractor, 180.0, [0.0, 1.0, 0.0], textures=texturas5))
+
 
 def update_simulation(step):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
@@ -390,7 +397,6 @@ def update_simulation(step):
             is_being_carried = caja["is_being_carried"]
 
             if is_being_carried:
-                
                 # Obtener el ángulo del montacarga
                 angle_montacarga = montacargas_class[0].getAngle()
                 cajas_class[cont].setBeingCarried(True, angle_montacarga)

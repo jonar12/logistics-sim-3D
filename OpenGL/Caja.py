@@ -52,7 +52,7 @@ class Caja:
 
     def drawBox(self):
         glPushMatrix()
-        glTranslatef(-1.1, 0.0, 5.0)
+        glTranslatef(self.body[0] / 2, 0.0, self.body[2] / 2)
         glColor3f(*self.color)
 
         glBegin(GL_QUADS)
