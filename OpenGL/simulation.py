@@ -28,6 +28,7 @@ from Contenedor import Contenedor
 from Ambiente import Ambiente
 from PIL import Image, ImageColor
 from O_Wall import Walls
+from O_Building import Build
 
 # Inicializar Pygame
 pygame.init()
@@ -62,6 +63,9 @@ House = []
 House2 = []
 House3 = []
 objetos = []
+Prop_Obj = []
+Tower1 = []
+
 
 # Realizar las llamadas a la API asíncronamente	
 async def asynchronous_call():
@@ -137,6 +141,13 @@ filenames_objects = ["./textures/acero_negro.png", "./textures/llanta.png", "./t
 # Desde aqui es filename 5:
 filenames_objects.append("./textures/sky.png")
 filenames_objects.append("./textures/road.png")
+
+# Imagenes de edificios
+filenames_objects.append("./textures/png textures/ed6 2.jpg") # 7
+filenames_objects.append("./textures/png textures/hole.jpg") # 8
+filenames_objects.append("./textures/png textures/ed5.jpg") # 9
+filenames_objects.append("./textures/png textures/ed1.jpg") # 10
+
 
 # Cargamos los puntos del archivo .obj del Montacarga
 montacarga_obj = pywavefront.Wavefront('./models_3D/Forklift.obj', create_materials=True, collect_faces=True)
@@ -237,29 +248,72 @@ def cargar_objeto_con_texturas(scene):
             textures[material.name] = cargar_textura(material.image)
     return textures
 
+limit = -120
+
 def Init():
     
+    
+    
+    
    # Pared frontal
-    Wall.append([-40, -40, -40, DimBoard, False])
-    Wall.append([-40, -40, DimBoard, -40, False])
+    Wall.append([limit, limit, limit, DimBoard, False])
+    Wall.append([limit, limit, DimBoard, limit, False])
+    Wall.append([limit, DimBoard, limit, DimBoard*2, False])
+    Wall.append([DimBoard, limit, DimBoard*2, limit, False])
     
     # Casa de prueba
-    House.append([-150, 30, -90])
-    House.append([-150, 10, 20])
+    #House.append([-150, 30, -90])
+    #House.append([-150, 10, 20])
     
-    House.append([-50, 10, -110])
+    #House.append([-50, 10, -110])
     
-    House2.append([-40, -45, 45])
-    House2.append([-30, 0, 150])
-    House2.append([110, 0, -40])
+    #House2.append([-40, -45, 45])
+    #House2.append([-30, 0, 150])
+    #House2.append([110, 0, -40])
     
     #House3.append([80, -1, 80])
-    House3.append([90.0, 0, 80.0])
+    #House3.append([90.0, 0, 80.0])
+    
+    #x se acerca a la pared del cielo
+    
+    #z sube y baja por la calle
+    
+    #Edificio 1
+    Tower1.append([limit+65, -60, limit+65, 0, 100, 7])
+    Tower1.append([limit+65, -60, limit, -60, 100, 7])
+    Tower1.append([limit+65, 0, limit, 0, 100, 7])
+
+    #Edificio 2
+    Tower1.append([limit+50, 70, limit+50, 10, 70, 7])
+    Tower1.append([limit+50, 70, limit-10, 70, 70, 7])
+    Tower1.append([limit+50, 10, limit-10, 10, 70, 7])
+    
+    #Hueco
+    Tower1.append([-15, 1 + limit, 29 , 1 + limit, 50, 8])
+    
+    #Edificio 3
+    Tower1.append([limit+20, 90, limit+20, 110, 140, 9])
+    Tower1.append([limit+20, 90, limit, 90, 140, 9])
+    Tower1.append([limit+20, 110, limit, 110, 140, 9])
+    
+    #Edificio 4
+    Tower1.append([limit+70, 140, limit+70, 170, 60, 10])
+    Tower1.append([limit+70, 170, limit, 170, 60, 10])
+    Tower1.append([limit+70, 120, limit, 120, 60, 10])
+    
+    #Edificio 5
+    Tower1.append([limit+50, 140, limit+50, 170, 60, 10])
+    Tower1.append([limit+50, 170, limit-20, 170, 60, 10])
+    Tower1.append([limit+50, 120, limit-20, 120, 60, 10])
     
     #CREACION DE LOS OBJETOS INDICADOS
     for i in Wall:
         [x11, z11, x22, z22, jump] = i
         Wall_Obj.append(Walls(x11, z11, x22, z22, jump))
+        
+    for i in Tower1:
+        [x11, z11, x22, z22, y, id] = i
+        Prop_Obj.append(Build(x11, z11, x22, z22, y, id))
     
     screen = pygame.display.set_mode(
         (screen_width, screen_height), DOUBLEBUF | OPENGL)
@@ -413,12 +467,16 @@ def update_simulation(step):
         obj.draw()
 
     # Se dibuja el contenedor
-    for obj in contenedor_class:
-        obj.draw()
+    #for obj in contenedor_class:
+    #    obj.draw()
     
     # Se dibuja las paredes
     for obj in Wall_Obj:
         obj.drawCube(textures, 5)
+        
+    # Dibujo de props extras
+    for obj in Prop_Obj:
+        obj.drawCube(textures)  
         
     # Dibujar los montacargas
     for obj in objetos:
@@ -444,6 +502,21 @@ def update_simulation(step):
     glTexCoord2f(1.0, 0.0)
     glVertex3d(DimBoard, -9.0, -DimBoard)
     glEnd()
+    
+    # Piso de concreto 2
+    glColor3f(1.0, 1.0, 1.0)
+    glEnable(GL_TEXTURE_2D)
+    glBindTexture(GL_TEXTURE_2D, textures[4])
+    glBegin(GL_QUADS)
+    glTexCoord2f(0.0, 0.0)
+    glVertex3d(limit, -10.0, 0)
+    glTexCoord2f(0.0, 1.0)
+    glVertex3d(limit, -10.0, DimBoard*2)
+    glTexCoord2f(1.0, 1.0)
+    glVertex3d(DimBoard*2, -10.0, DimBoard*2)
+    glTexCoord2f(1.0, 0.0)
+    glVertex3d(DimBoard*2, -10.0, limit)
+    glEnd()
 
     # Carretera
     glBindTexture(GL_TEXTURE_2D, textures[6])
@@ -457,6 +530,19 @@ def update_simulation(step):
     glTexCoord2f(1.0, 0.0)
     glVertex3d(28.0, -8.8, 0)
     glEnd()
+    
+    glBindTexture(GL_TEXTURE_2D, textures[6])
+    glBegin(GL_QUADS)
+    glTexCoord2f(0.0, 0.0)
+    glVertex3d(-13.5, -8.8, DimBoard)
+    glTexCoord2f(0.0, 1.0)
+    glVertex3d(-13.5, -8.8, DimBoard*2)
+    glTexCoord2f(1.0, 1.0)
+    glVertex3d(28.0, -8.8, DimBoard*2)
+    glTexCoord2f(1.0, 0.0)
+    glVertex3d(28.0, -8.8, DimBoard)
+    glEnd()
+
 
     glBindTexture(GL_TEXTURE_2D, textures[6])
     glBegin(GL_QUADS)
