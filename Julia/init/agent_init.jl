@@ -4,17 +4,17 @@ include("../utils/color_utils.jl")
 using Agents
 
 function initialize_lifts(model, n_lifts=1, spacing=10)
-    z = 90
+    z = 155
 
     for i in 1:n_lifts
         lift = add_agent!(Lift, model)
-        lift.pos = (div(model.container["width"], 2), 0, z)
+        lift.pos = (70, 0, z)
         z += spacing
     end
 end
 
 function initialize_boxes(boxes, model, padding=1)
-    z = model.container["depth"] + 40
+    z = model.container["depth"] + 33
 
     for box in boxes
         # Crear agente Box

@@ -4,11 +4,15 @@ from OpenGL.GLUT import *
 
 class Contenedor:
     def __init__(self, body, pos, color):
-        self.posicion = pos
+        self.position = pos
         self.body = body
         self.color = color
         self.display_list = self.create_display_list()
-    
+
+    # Método para mover el contenedor hacia adelante
+    def forward(self):
+        self.position[2] += -1 
+        
     def create_display_list(self):
         display_list = glGenLists(1)
         glNewList(display_list, GL_COMPILE)
@@ -91,7 +95,7 @@ class Contenedor:
     
     def draw(self):
         glPushMatrix()
-        glTranslatef(self.posicion[0], self.posicion[1], self.posicion[2])
+        glTranslatef(self.position[0], self.position[1], self.position[2])
         glScaled(1.0, 1.0, 1.0)
 
         glDisable(GL_LIGHTING)

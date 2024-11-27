@@ -24,6 +24,9 @@ class Ambiente:
             self.render_with_materials()
         glEndList()
         return display_list
+    
+    def setPos(self, pos):
+        self.position = pos
         
     def render_with_materials(self):
         for _, mesh in self.scene.meshes.items():

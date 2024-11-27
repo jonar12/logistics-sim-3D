@@ -9,10 +9,9 @@ from OpenGL.GLUT import *
 import random
 import math
 
-class Fake_Floors:
+class Build:
     
-    #def __init__(self, x11, z11, x22, z22, x33, z33, x44, z44, la_Y):
-    def __init__(self, x11, z11, x22, z22, la_Z, la_Y, la_id):
+    def __init__(self, x11, z11, x22, z22, y, id):
         #Se inicializa las coordenadas de los vertices del cubo
         self.vertexCoords = [  
                    1,1,1,   1,1,-1,   1,-1,-1,   1,-1,1,
@@ -28,24 +27,24 @@ class Fake_Floors:
 
         #self.DimBoard = dim
         #Se inicializa una posicion aleatoria en el tablero
-        self.Position = [0, 0, 0]
+        self.Position = []
+        self.Position.append(0) #200 maximo
+        self.Position.append(0)
+        self.Position.append(0) #224 maximo
         #Se inicializa un vector de direccion aleatorio
-        self.Direction = [0, 0, 0]
+        self.Direction = []
+        self.Direction.append(0)
+        self.Direction.append(0)
+        self.Direction.append(0)
         
         # Pocición:
         self.x1 = x11 
         self.z1 = z11 
         self.x2 = x22 
         self.z2 = z22
-        self.D = la_Z
-        self.Up = la_Y
-        self.id = la_id
-
+        self.y = y
+        self.id = id
         
-        
-
-    #def update(self):
-    #    x = 1
     
     def draw(self):
         glPushMatrix()
@@ -80,23 +79,10 @@ class Fake_Floors:
         #Activate textures
         glEnable(GL_TEXTURE_2D)
         #front face
-        glBindTexture(GL_TEXTURE_2D, texture[self.id])
-        #self.drawFace(self.x1, self.Up, self.z1, self.x2, self.Up, self.z2, self.x3, self.Up, self.z3, self.x4, self.Up, self.z4)
         
-        self.drawFace(self.x1+self.D, self.Up, self.z2, self.x1+self.D, self.Up, self.z1, self.x1, self.Up, self.z1, self.x2, self.Up, self.z2)
-        """
-        #right face
-        glBindTexture(GL_TEXTURE_2D, texture[id])
-        self.drawFace(1.0, 1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, -1.0, 1.0, 1.0, -1.0)
-        #back face
-        glBindTexture(GL_TEXTURE_2D, texture[id])
-        self.drawFace(1.0, 1.0, -1.0, -1.0, 1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, -1.0)
-        #left face
-        glBindTexture(GL_TEXTURE_2D, texture[id])
-        self.drawFace(-1.0, 1.0, -1.0, -1.0, -1.0, -1.0, -1.0, -1.0, 1.0, -1.0, 1.0, 1.0)
-        #Up face
-        glBindTexture(GL_TEXTURE_2D, texture[id])
-        self.drawFace(1.0, 1.0, 1.0, -1.0, 1.0, 1.0, -1.0, 1.0, -1.0, 1.0, 1.0, -1.0)
-        """
+        glBindTexture(GL_TEXTURE_2D, texture[self.id])
+            
+        self.drawFace(self.x1, self.y, self.z1, self.x1, -10, self.z1, self.x2, -10, self.z2, self.x2, self.y, self.z2)
+        
         glDisable(GL_TEXTURE_2D)
         glPopMatrix()
