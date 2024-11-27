@@ -12,7 +12,7 @@ import math
 class Fake_Floors:
     
     #def __init__(self, x11, z11, x22, z22, x33, z33, x44, z44, la_Y):
-    def __init__(self, x11, z11, x22, z22, la_Z, la_Y):
+    def __init__(self, x11, z11, x22, z22, la_Z, la_Y, la_id):
         #Se inicializa las coordenadas de los vertices del cubo
         self.vertexCoords = [  
                    1,1,1,   1,1,-1,   1,-1,-1,   1,-1,1,
@@ -37,8 +37,9 @@ class Fake_Floors:
         self.z1 = z11 
         self.x2 = x22 
         self.z2 = z22
-        self.D_4ward = la_Z
+        self.D = la_Z
         self.Up = la_Y
+        self.id = la_id
 
         
         
@@ -71,7 +72,7 @@ class Fake_Floors:
         glVertex3f(x4, y4, z4)
         glEnd()
         
-    def drawCube(self, texture, id):
+    def drawCube(self, texture):
         glPushMatrix()
         glTranslatef(0, 0, 0)
         glScaled(1,1,1)
@@ -79,10 +80,10 @@ class Fake_Floors:
         #Activate textures
         glEnable(GL_TEXTURE_2D)
         #front face
-        glBindTexture(GL_TEXTURE_2D, texture[id])
+        glBindTexture(GL_TEXTURE_2D, texture[self.id])
         #self.drawFace(self.x1, self.Up, self.z1, self.x2, self.Up, self.z2, self.x3, self.Up, self.z3, self.x4, self.Up, self.z4)
         
-        self.drawFace(self.D_4ward, self.Up, self.z2, self.D_4ward, self.Up, self.z1, self.x1, self.Up, self.z1, self.x2, self.Up, self.z2)
+        self.drawFace(self.x1+self.D, self.Up, self.z2, self.x1+self.D, self.Up, self.z1, self.x1, self.Up, self.z1, self.x2, self.Up, self.z2)
         """
         #right face
         glBindTexture(GL_TEXTURE_2D, texture[id])

@@ -29,6 +29,7 @@ from Ambiente import Ambiente
 from PIL import Image, ImageColor
 from O_Wall import Walls
 from O_Building import Build
+from O_Floor import Fake_Floors
 
 # Inicializar Pygame
 pygame.init()
@@ -65,6 +66,12 @@ House3 = []
 objetos = []
 Prop_Obj = []
 Tower1 = []
+Floor = []
+Floor_Obj = []
+
+# follow
+follow = False
+move = False
 
 
 # Realizar las llamadas a la API asíncronamente	
@@ -147,6 +154,13 @@ filenames_objects.append("./textures/png textures/ed6 2.jpg") # 7
 filenames_objects.append("./textures/png textures/hole.jpg") # 8
 filenames_objects.append("./textures/png textures/ed5.jpg") # 9
 filenames_objects.append("./textures/png textures/ed1.jpg") # 10
+filenames_objects.append("./textures/png textures/ed77.jpg") # 11
+filenames_objects.append("./textures/png textures/4000.jpg") # 12 SUELO
+filenames_objects.append("./textures/png textures/ed4.jpg") # 13
+filenames_objects.append("./textures/png textures/road 2.png") # 14 SUELO 2
+filenames_objects.append("./textures/png textures/bush.jpg") # 15 SUELO 3
+filenames_objects.append("./textures/png textures/bridge.jpg") # 16 puente
+
 
 
 # Cargamos los puntos del archivo .obj del Montacarga
@@ -282,11 +296,13 @@ def Init():
     Tower1.append([limit+65, -60, limit+65, 0, 100, 7])
     Tower1.append([limit+65, -60, limit, -60, 100, 7])
     Tower1.append([limit+65, 0, limit, 0, 100, 7])
+    Floor.append([limit+65, -60, limit+65, 0, -65, 100, 12])
 
     #Edificio 2
     Tower1.append([limit+50, 70, limit+50, 10, 70, 7])
     Tower1.append([limit+50, 70, limit-10, 70, 70, 7])
     Tower1.append([limit+50, 10, limit-10, 10, 70, 7])
+    Floor.append([limit+50, 10, limit+50, 70, -60, 70, 12])
     
     #Hueco
     Tower1.append([-15, 1 + limit, 29 , 1 + limit, 50, 8])
@@ -295,16 +311,37 @@ def Init():
     Tower1.append([limit+20, 90, limit+20, 110, 140, 9])
     Tower1.append([limit+20, 90, limit, 90, 140, 9])
     Tower1.append([limit+20, 110, limit, 110, 140, 9])
+    Floor.append([limit+20, 90, limit+20, 110, -20, 140, 12])
+    
     
     #Edificio 4
-    Tower1.append([limit+70, 140, limit+70, 170, 60, 10])
+    Tower1.append([limit+70, 120, limit+70, 170, 60, 10])
     Tower1.append([limit+70, 170, limit, 170, 60, 10])
     Tower1.append([limit+70, 120, limit, 120, 60, 10])
+    Floor.append([limit+70, 120, limit+70, 170, -70, 60, 12])
     
     #Edificio 5
-    Tower1.append([limit+50, 140, limit+50, 170, 60, 10])
-    Tower1.append([limit+50, 170, limit-20, 170, 60, 10])
-    Tower1.append([limit+50, 120, limit-20, 120, 60, 10])
+    Tower1.append([limit+50, 170, limit+50, 300, 90, 11])
+    Tower1.append([limit+50, 300, limit-40, 300, 90, 11])
+    Tower1.append([limit+50, 170, limit-40, 170, 90, 11])
+    Floor.append([limit+50, 170, limit+50, 300, -70, 90, 12]) # 90 = y
+    
+    #Edificio 6
+    Tower1.append([50, -70, 50, 0, 90, 13])
+    Tower1.append([50, 0, 200, 0, 90, 13])
+    Tower1.append([50, -70, 200, -70, 90, 13])
+    Tower1.append([140, -70, 200, 0, 90, 13])
+    Floor.append([50, -70, 50, 0, 150, 90, 12])
+    
+    #Puente
+    Tower1.append([limit, -70, -13.5, -70, 30, 16])
+    Tower1.append([28, -70, DimBoard, -70, 30, 16])
+    Tower1.append([DimBoard, -70, DimBoard, limit, 30, 16])
+    Tower1.append([28, -70, 28, limit, 30, 16])
+    Tower1.append([-13.5, -70, -13.5, limit, 30, 16])
+    
+    
+    
     
     #CREACION DE LOS OBJETOS INDICADOS
     for i in Wall:
@@ -314,6 +351,11 @@ def Init():
     for i in Tower1:
         [x11, z11, x22, z22, y, id] = i
         Prop_Obj.append(Build(x11, z11, x22, z22, y, id))
+    
+    for i in Floor:
+        [x11, z11, x22, z22, z, y, id] = i
+        Floor_Obj.append(Fake_Floors(x11, z11, x22, z22, z, y, id))
+        
     
     screen = pygame.display.set_mode(
         (screen_width, screen_height), DOUBLEBUF | OPENGL)
@@ -393,7 +435,13 @@ def Init():
 
     ambiente_class.append(Ambiente([200.0, -8.9, 35.0], [0.15, 0.15, 0.15], yellow_protractor, 180.0, [0.0, 1.0, 0.0], textures=texturas5))
 
+truck_mov = -7.0
 def update_simulation(step):
+    global EYE_X, EYE_Y, EYE_Z
+    global CENTER_X, CENTER_Y, CENTER_Z
+    global follow
+    global move
+    global truck_mov
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     # Dibujar los ejes del sistema
@@ -444,17 +492,38 @@ def update_simulation(step):
                     rotation_completed = False
 
     # Actualizar la posición de las cajas solo si la rotación del montacarga ha terminado
-    if step < len(cajas):
-        for cont, caja in enumerate(cajas[step]):
-            pos = caja["pos"]
-            is_being_carried = caja["is_being_carried"]
-            cajas_class[cont].setPosition(pos)
-            if is_being_carried:
-                cajas_class[cont].setBeingCarried(True, montacargas_class[0])
-            else:
-                cajas_class[cont].setBeingCarried(False)
+    if not follow:
+        if step < len(cajas):
+            for cont, caja in enumerate(cajas[step]):
+                pos = caja["pos"]
+                is_being_carried = caja["is_being_carried"]
+                cajas_class[cont].setPosition(pos)
+                if is_being_carried:
+                    cajas_class[cont].setBeingCarried(True, montacargas_class[0])
+                else:
+                    cajas_class[cont].setBeingCarried(False)
 
-            cajas_class[cont].update_position_y()
+                cajas_class[cont].update_position_y()
+            
+    if follow:
+        wow = montacargas_class[0].getPosition()
+        EYE_Y = 5
+        EYE_X = wow[0]
+        EYE_Z = wow[2]
+        r = radians(90-montacargas_class[0].getAngle())
+        dir_x = cos(r)
+        dir_z = sin(r)
+        CENTER_X = EYE_X + dir_x
+        CENTER_Y = EYE_Y  # Mantener la misma altura
+        CENTER_Z = EYE_Z + dir_z
+        
+    if move:
+        truck_mov = truck_mov - 1
+        ad = [7.3, 8.9, truck_mov]
+        ambiente_class[0].setPos(ad)
+        for cont, caja in enumerate(cajas[step]):
+            cajas_class[cont].setBye()
+            
 
     # Dibujar los montacargas
     for obj in montacargas_class:
@@ -463,8 +532,9 @@ def update_simulation(step):
     
     # Se dibujan las cajas
     for obj in cajas_class:
-        obj.returnToFinalPosition()
-        obj.draw()
+        if not move:
+            obj.returnToFinalPosition()
+            obj.draw()
 
     # Se dibuja el contenedor
     #for obj in contenedor_class:
@@ -476,6 +546,10 @@ def update_simulation(step):
         
     # Dibujo de props extras
     for obj in Prop_Obj:
+        obj.drawCube(textures)  
+        
+    # Dibujo de suelos
+    for obj in Floor_Obj:
         obj.drawCube(textures)  
         
     # Dibujar los montacargas
@@ -509,7 +583,7 @@ def update_simulation(step):
     glBindTexture(GL_TEXTURE_2D, textures[4])
     glBegin(GL_QUADS)
     glTexCoord2f(0.0, 0.0)
-    glVertex3d(limit, -10.0, 0)
+    glVertex3d(limit, -10.0, limit)
     glTexCoord2f(0.0, 1.0)
     glVertex3d(limit, -10.0, DimBoard*2)
     glTexCoord2f(1.0, 1.0)
@@ -555,6 +629,23 @@ def update_simulation(step):
     glTexCoord2f(1.0, 0.0)
     glVertex3d(28.0, -8.8, 0)
     glEnd()
+    
+    
+    # Carretera 2
+    glBindTexture(GL_TEXTURE_2D, textures[14])
+    glBegin(GL_QUADS)
+    glTexCoord2f(0.0, 0.0)
+    glVertex3d(limit, 30, limit)
+    glTexCoord2f(1.0, 0.0)
+    glVertex3d(DimBoard, 30, limit)
+    glTexCoord2f(1.0, 1.0)
+    glVertex3d(DimBoard, 30, -70)
+    glTexCoord2f(0.0, 1.0)
+    glVertex3d(limit, 30, -70)
+    
+    glEnd()
+    
+    
     glDisable(GL_TEXTURE_2D)
 
     return rotation_completed
@@ -565,6 +656,8 @@ def handleMovement(keys):
     global EYE_X, EYE_Y, EYE_Z
     global CENTER_X, CENTER_Y, CENTER_Z
     global theta
+    global follow
+    global move
 
     # Calcular el vector de dirección a partir de theta
     r = radians(theta)
@@ -589,6 +682,15 @@ def handleMovement(keys):
         EYE_X -= dir_z * speed_movement
         EYE_Z += dir_x * speed_movement
         
+    if keys[pygame.K_e]:
+        follow = True
+         
+    if keys[pygame.K_r]:
+        follow = False
+        
+    if keys[pygame.K_t]:
+        move = True
+        
     # Movimiento vertical (Flechas arriba y abajo)
     if keys[pygame.K_UP]:
         if EYE_Y < 500:
@@ -612,10 +714,11 @@ def handleMovement(keys):
     r = radians(theta)
     dir_x = cos(r)
     dir_z = sin(r)
-
-    CENTER_X = EYE_X + dir_x
-    CENTER_Y = EYE_Y  # Mantener la misma altura
-    CENTER_Z = EYE_Z + dir_z
+    
+    if not follow:
+        CENTER_X = EYE_X + dir_x
+        CENTER_Y = EYE_Y  # Mantener la misma altura
+        CENTER_Z = EYE_Z + dir_z
     
 Init()
 
@@ -623,7 +726,6 @@ done = False
 
 # Pasos de simulación
 simulation_step = 0
-
 while not done:
     for event in pygame.event.get():
         if event.type == pygame.KEYDOWN:

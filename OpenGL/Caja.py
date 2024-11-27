@@ -47,6 +47,9 @@ class Caja:
 
     def setAngle(self, angle):
         self.angle = angle
+        
+    def setBye(self):
+        self.position[2] = self.position[2] - 1
     
     def draw(self):
         glPushMatrix()
