@@ -443,7 +443,7 @@ def update_simulation(step):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
     # Dibujar los ejes del sistema
-    Axis()
+    # Axis()
 
     #Se dibuja el plano gris
     glColor3f(0.53, 0.81, 0.92)
