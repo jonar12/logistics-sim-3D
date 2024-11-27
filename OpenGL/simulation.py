@@ -521,8 +521,8 @@ def update_simulation(step):
         truck_mov = truck_mov - 1
         ad = [7.3, 8.9, truck_mov]
         ambiente_class[0].setPos(ad)
-        for cont, caja in enumerate(cajas[step]):
-            cajas_class[cont].setBye()
+        #for cont, caja in enumerate(cajas[step]):
+        #    cajas_class[cont].setBye()
             
 
     # Dibujar los montacargas
