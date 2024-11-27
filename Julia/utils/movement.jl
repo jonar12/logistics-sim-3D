@@ -79,7 +79,7 @@ function move_lift_to_end(lift, model)
     # Calculate steps in y, z, and x
     dy = sign(0 - lift.pos[2])
     dz = sign(100 - lift.pos[3])
-    dx = sign(div(model.container["width"], 2) - lift.pos[1])
+    dx = sign(160 - lift.pos[1])
 
     # Prioritize y movement first
     if dy != 0

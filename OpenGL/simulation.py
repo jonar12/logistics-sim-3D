@@ -67,7 +67,7 @@ objetos = []
 async def asynchronous_call():
     start_time = datetime.now()
     async with aiohttp.ClientSession() as session:
-        for _ in range(4000):
+        for _ in range(4500):
             async with session.get(URL_BASE + LOCATION) as response:
                 response = await response.json()
 
