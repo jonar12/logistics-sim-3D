@@ -339,7 +339,6 @@ def Init():
 
     ambiente_class.append(Ambiente([200.0, -8.9, 35.0], [0.15, 0.15, 0.15], yellow_protractor, 180.0, [0.0, 1.0, 0.0], textures=texturas5))
 
-
 def update_simulation(step):
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT)
 
@@ -395,15 +394,12 @@ def update_simulation(step):
         for cont, caja in enumerate(cajas[step]):
             pos = caja["pos"]
             is_being_carried = caja["is_being_carried"]
-
+            cajas_class[cont].setPosition(pos)
             if is_being_carried:
-                # Obtener el ángulo del montacarga
-                angle_montacarga = montacargas_class[0].getAngle()
-                cajas_class[cont].setBeingCarried(True, angle_montacarga)
+                cajas_class[cont].setBeingCarried(True, montacargas_class[0])
             else:
                 cajas_class[cont].setBeingCarried(False)
 
-            cajas_class[cont].setPosition(pos)
             cajas_class[cont].update_position_y()
 
     # Dibujar los montacargas
