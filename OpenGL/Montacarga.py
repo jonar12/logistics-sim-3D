@@ -8,7 +8,7 @@ from OpenGL.GLUT import *
 class Montacarga:
     def __init__(self, pos, angle, obj, materiales):
         self.materiales = materiales
-        self.position = [pos[0] + 2.5, 0.0, pos[2] + 2.5]
+        self.position = [pos[0] + 2.5, 0.0, pos[2] + 7.5]
         # self.position = [pos[0], 18.5, pos[2]]
         self.angle = angle
         self.scene = obj
@@ -21,7 +21,7 @@ class Montacarga:
     # def setPosition(self, pos):
     #     self.position = [pos[0] + 0.5, 0, pos[2] + 14.5]
     def setPosition(self, pos):
-        self.next_position = [pos[0] + 2.5, 0, pos[2] + 2.5]
+        self.next_position = [pos[0] + 2.5, 0, pos[2] + 7.5]
 
     def getPosition(self):
         return self.position

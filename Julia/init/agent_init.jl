@@ -4,7 +4,7 @@ include("../utils/color_utils.jl")
 using Agents
 
 function initialize_lifts(model, n_lifts=1, spacing=10)
-    z = 100
+    z = 90
 
     for i in 1:n_lifts
         lift = add_agent!(Lift, model)

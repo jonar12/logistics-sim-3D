@@ -14,8 +14,6 @@ function select_box(agent, model)
         # Select the highest-priority box (first in the sorted list)
         selected_box = first(sorted_boxes)
 
-        # Mark the selected box as being carried
-        selected_box.is_being_carried = true
         return selected_box
     else
         # Return nothing if no boxes are available

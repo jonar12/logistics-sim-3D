@@ -13,14 +13,17 @@ class Caja:
         self.body = body
         self.color = color
         self.is_being_carried = False
+        self.is_it_in_its_final_pos = False
         self.angle = 0 # Ángulo de rotación de la caja
         self.angle_montacarga = 0
+        self.carrier = None # Hace referencia al Montacarga
 
     def returnToFinalPosition(self):
         initialPosX, _, initialPosZ = self.position
         finalPosX, _, finalPosZ = self.final_pos
         if initialPosX == finalPosX and initialPosZ  == finalPosZ:
             self.position = self.final_pos
+            self.is_it_in_its_final_pos = True
 
     def setPosition(self, pos):
         self.position = [pos[0], -8.5, pos[2]]
@@ -28,9 +31,15 @@ class Caja:
     def getPosition(self):
         return self.position
     
-    def setBeingCarried(self, is_being_carried, angle_montacarga=None):
+    def setBeingCarried(self, is_being_carried, carrier=None):
         self.is_being_carried = is_being_carried
-        self.angle_montacarga = angle_montacarga
+        self.carrier = carrier
+        if carrier is not None:
+            self.angle_montacarga = carrier.getAngle()
+        else:
+            self.carrier = None
+            self.angle_montacarga = None
+            self.angle = 0
     
     def update_position_y(self):
         if self.is_being_carried:
@@ -41,18 +50,41 @@ class Caja:
     
     def draw(self):
         glPushMatrix()
-        glTranslatef(self.position[0], self.position[1], self.position[2])
-        if self.is_being_carried and self.angle_montacarga is not None:
-            glRotatef(self.angle_montacarga, 0.0, 1.0, 0.0)
+        if self.is_being_carried and self.angle_montacarga is not None and self.carrier is not None:
+            # Obtener la posición y el ángulo del montacargas
+            carrier_pos = self.carrier.getPosition()
+            carrier_angle = self.carrier.getAngle()
 
-        # Dibujamos la caja
+            # Trasladar a la posición del montacargas
+            glTranslatef(carrier_pos[0], carrier_pos[1], carrier_pos[2])
+
+            # Aplicar la rotación del montacargas
+            glRotatef(carrier_angle, 0.0, 1.0, 0.0)
+
+            # Verificar el tamaño de la caja para ajustar la posición
+            match self.body[0]:
+                case 1.0:
+                    # Ajuste de la posición de la caja de tamaño 1.0
+                    glTranslatef(-3.5, self.position[1], 9.0)
+                case 5.0:
+                    # Ajuste de la posición de la caja de tamaño 5.0
+                    glTranslatef(-5.0, self.position[1], 8.0)
+                case 7.0:
+                    # Ajuste de la posición de la caja de tamaño 7.0
+                    glTranslatef(-7.0, self.position[1], 5.8)
+        else:
+            # Si la caja no está siendo llevada, usar su posición normal
+            glTranslatef(self.position[0], self.position[1], self.position[2])
+            glRotatef(self.angle, 0.0, 1.0, 0.0)
+
+        # Dibujar la caja centrada en el origen
         self.drawBox()
-
         glPopMatrix()
 
     def drawBox(self):
         glPushMatrix()
-        glTranslatef(-1.1, 0.0, 5.0)
+        if not self.is_it_in_its_final_pos:
+            glTranslatef(self.body[0] / 2, 0.0, self.body[2] / 2)
         glColor3f(*self.color)
 
         glBegin(GL_QUADS)
