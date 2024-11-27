@@ -27,6 +27,10 @@ class Caja:
 
     def setPosition(self, pos):
         self.position = [pos[0], -8.5, pos[2]]
+    
+    # Método para mover la caja hacia adelante
+    def forward(self):
+        self.position[2] += -1
 
     def getPosition(self):
         return self.position

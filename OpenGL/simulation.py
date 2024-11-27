@@ -78,7 +78,7 @@ move = False
 async def asynchronous_call():
     start_time = datetime.now()
     async with aiohttp.ClientSession() as session:
-        for _ in range(4500):
+        for _ in range(4200):
             async with session.get(URL_BASE + LOCATION) as response:
                 response = await response.json()
 
@@ -160,8 +160,6 @@ filenames_objects.append("./textures/png textures/ed4.jpg") # 13
 filenames_objects.append("./textures/png textures/road 2.png") # 14 SUELO 2
 filenames_objects.append("./textures/png textures/bush.jpg") # 15 SUELO 3
 filenames_objects.append("./textures/png textures/bridge.jpg") # 16 puente
-
-
 
 # Cargamos los puntos del archivo .obj del Montacarga
 montacarga_obj = pywavefront.Wavefront('./models_3D/Forklift.obj', create_materials=True, collect_faces=True)
@@ -523,7 +521,11 @@ def update_simulation(step):
         ambiente_class[0].setPos(ad)
         # for cont, caja in enumerate(cajas[step]):
             # cajas_class[cont].setBye()
-            
+    
+    # El camión se mueve junto al contenedor y las cajas
+    if step == 4200:
+        move = True
+
     # Dibujar los montacargas
     for obj in montacargas_class:
         obj.update()
@@ -531,12 +533,15 @@ def update_simulation(step):
     
     # Se dibujan las cajas
     for obj in cajas_class:
-        if not move:
-            obj.returnToFinalPosition()
-            obj.draw()
+        obj.returnToFinalPosition()
+        if move:
+            obj.forward()
+        obj.draw()
 
     # Se dibuja el contenedor
     for obj in contenedor_class:
+       if move:
+           obj.forward()
        obj.draw()
     
     # Se dibuja las paredes
