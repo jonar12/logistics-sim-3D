@@ -276,14 +276,14 @@ def Init():
     glEnable(GL_DEPTH_TEST)
     glPolygonMode(GL_FRONT_AND_BACK, GL_FILL)
     
-    #Creando a las casas
+    # Creando a las casas
     for i in House:   
         objetos.append(Comp(DimBoard, 1, i,  ob[0], mat[0], [0.1,0.1,0.1], 45))
         
     for i in House2:   
         objetos.append(Comp(DimBoard, 1, i,  ob[1], mat[1], [10,10,10], 90))
             
-    #w Texturas
+    # Texturas
     for i in filenames_objects:
         Texturas(i)
 
