@@ -12,9 +12,9 @@
     ```bash
     cd OpenGL
     ```
-	4.	Iniciar el servidor de desarrollo de React:
+	4.	Iniciar la ventana de PyOpenGL:
     ```bash
-    python simulation.py
+    python main.py
     ```
 	5.	Cambiar al directorio del backend en Julia:
     ```bash
