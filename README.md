@@ -12,20 +12,15 @@
     ```bash
     cd OpenGL
     ```
-
 	4.	Iniciar el servidor de desarrollo de React:
     ```bash
     python simulation.py
     ```
-
 	5.	Cambiar al directorio del backend en Julia:
     ```bash
     cd Julia
     ```
-
 	6.	Ejecutar el archivo webapi en Julia:
     ```bash
     julia webapi.jl
     ```
-
-
