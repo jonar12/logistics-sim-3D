@@ -1,0 +1,82 @@
+
+# Byte-compiled / optimized / DLL files
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Julia-related
+*.jl.cov
+*.jl.*
+.julia/
+
+# Node modules and Vite
+node_modules/
+dist/
+.vite/
+.env
+.env.*
+
+# macOS
+.DS_Store
+
+# Python environments
+.venv/
+env/
+venv/
+
+# VS Code
+.vscode/
+
+# JetBrains IDEs
+.idea/
+
+# Log files
+*.log
+
+# Build outputs
+/build/
+/out/
+
+# OS generated files
+Thumbs.db
+ehthumbs.db
+Icon?
+Desktop.ini
+
+# Python notebooks checkpoints
+.ipynb_checkpoints/
+
+# Compiled source
+*.com
+*.class
+*.dll
+*.exe
+*.o
+*.so
+
+# HTML build folder
+_build/
+
+# npm debug logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# Coverage directory
+coverage/
+
+# Pytest cache
+.pytest_cache/
+
+# Local .env files and secret keys
+*.secret
+*.key
+
+# Editor swap files
+*~
+*.swp
+*.swo
+
+# React dev tools artifacts
+.local-chromium/
+.local-firefox/
