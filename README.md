@@ -1,71 +1,69 @@
-# 📦 Simulación Logística 3D
+# 📦 3D Logistics Simulation
 
-Simulación logística tridimensional que modela el acomodo eficiente de cajas en un contenedor de una van de entrega de ultima milla mediante agentes montacargas autónomos. El sistema emplea algoritmos de empaquetado (3D-Bin-Packing) y heurísticas de movimiento en un entorno gráfico realista, utilizando dos versiones de visualización: una renderizada con OpenGL y otra basada en React Three para la web.
+A three-dimensional logistics simulation that models the efficient arrangement of boxes inside a container using autonomous forklift agents. The system employs 3D bin packing algorithms and movement heuristics within a visually realistic environment, rendered through two versions: an OpenGL-based native renderer and a React Three Fiber web visualization.
 
-## 🌟 Propósito del Proyecto
+## 🌟 Project Purpose
 
-Este proyecto fue desarrollado para:
+This project was developed to:
 
-- Simular un entorno logístico realista con ambientación, almacén y camión de transporte.
-- Representar el acomodo óptimo de cajas de distintos tamaños en un contenedor, priorizando estabilidad y aprovechamiento del espacio.
-- Visualizar la lógica de comportamiento de múltiples montacargas autónomos ejecutando tareas concurrentes.
-- Explorar la integración entre algoritmos computacionales (Julia, Python) y motores gráficos (OpenGL, React Three).
+- Simulate a realistic logistics environment with background buildings, warehouse, and transport truck.
+- Represent the optimal arrangement of boxes of various sizes inside a container, prioritizing stability and space efficiency.
+- Visualize autonomous forklift agents executing concurrent tasks.
+- Explore integration between computational logic (Julia, Python) and rendering engines (OpenGL, React Three).
 
-Esta simulación sirve como herramienta educativa y demostrativa para entender simulaciones basadas en agentes, algoritmos de optimización, y renderizado 3D interactivo.
-
----
-
-## 🛠️ Tecnologías Utilizadas
-
-### Backend y Lógica de Empaquetado
-- **Python + Flask** — API REST para comunicar la lógica de empaquetado con simuladores gráficos
-- **Julia + Agents.jl** — Modelado de agentes montacargas y lógica de movimiento
-- **3D-Bin-Packing** — Algoritmo externo para el acomodo óptimo de cajas tridimensionales
-
-### Visualización Gráfica
-- **OpenGL (Python)** — Simulación 3D nativa con ambientación completa, cámara libre y renderizado de texturas
-- **React + Three Fiber (JS)** — Visualización web enfocada en la lógica del acomodo y monitoreo simplificado
-
-### Herramientas de Proyecto
-- Pygame + PyOpenGL — Entorno gráfico y manejo de cámara
+This simulation serves as an educational and demonstrative tool for understanding agent-based simulations, optimization algorithms, and interactive 3D rendering.
 
 ---
 
-## ⚙️ Características
+## 🛠️ Technologies Used
 
-- Simulación 3D con edificios, almacén y montacargas animados.
-- Control de cámara libre (teclas `WASD`, flechas, `e/r` para seguir montacargas).
-- Visualización transparente del contenedor para observar el acomodo.
-- Lógica de movimiento autónomo con prioridades y estados de los montacargas.
-- Variación de cajas (10x10x10, 50x50x50, 70x70x70) con posiciones finales calculadas.
-- Posprocesamiento visual del resultado de empaquetado.
+### Backend and Packing Logic
+- **Python + Flask** — REST API to connect packing logic with graphical simulators
+- **Julia + Agents.jl** — Agent modeling and movement logic
+- **3D-Bin-Packing Python Library** — External algorithm for 3D box arrangement
+### Graphics and Simulation
+- **OpenGL/PyGame (Python)** — Full 3D simulation with textured environment and free camera
+- **React + Three Fiber (JS)** — Web visualization focused on logic and monitoring
+### Project Tools
+- Git + Bitbucket — Version control
 
 ---
 
-## 🧩 Estructura del Código
+## ⚙️ Features
+
+- 3D simulation with animated forklifts, buildings, and container.
+- Free camera control (WASD, arrows, `e/r` to follow forklifts).
+- Transparent container for observing final arrangement.
+- Autonomous forklift logic with priorities and state management.
+- Three box types: 10x10x10, 50x50x50, 70x70x70.
+- Post-processing of the packing result for visualization.
+
+---
+
+## 🧩 Project Structure
 
 ```
 /cajas-kaggu
-├── 3D-bin-packing/         # Lógica de acomodo en Python usando 3DBinPacking
-│   └── api.py              # API Flask con endpoint /setItemAndBox
-├── Julia/                  # Lógica de agentes y movimiento en Julia
-│   └── webapi.jl           # Conexión Julia ↔ Python API y simulación
-├── OpenGL/                 # Simulación 3D con cámara libre
-│   ├── main.py             # Script principal de visualización
-│   ├── ClaseMontacarga.py  # Modelado de agente
-│   ├── ClaseCaja.py        # Modelado de cajas
-│   └── Ambiente.py         # Ambientación, texturas y entorno 3D
-├── kaggu-fe/               # Interfaz Web con React Three
-│   ├── public/             # Archivos estáticos
-│   └── src/                # Componentes y lógica de simulación
-└── README.md               # Documentación del proyecto
+├── 3D-bin-packing/         # Python logic using 3DBinPacking
+│   └── api.py              # Flask API with /setItemAndBox endpoint
+├── Julia/                  # Agent and movement logic in Julia
+│   └── webapi.jl           # Julia ↔ Python API and simulation bridge
+├── OpenGL/                 # 3D native simulation
+│   ├── main.py             # Main render script
+│   ├── ClaseMontacarga.py  # Forklift agent class
+│   ├── ClaseCaja.py        # Box behavior class
+│   └── Ambiente.py         # Environment and textures
+├── kaggu-fe/               # Web interface with React Three
+│   ├── public/             # Static assets
+│   └── src/                # Components and simulation logic
+└── README.md               # Project documentation
 ```
 
 ---
 
-## 🚀 Instrucciones de Ejecución
+## 🚀 How to Run
 
-### 🔹 OpenGL (Versión Completa)
+### 🔹 OpenGL (Full Simulation)
 ```bash
 git clone https://bitbucket.org/proyectos-tec-itc/cajas-kaggu
 cd cajas-kaggu
@@ -75,7 +73,7 @@ cd ../Julia && julia webapi.jl
 cd ../OpenGL && python main.py
 ```
 
-### 🔹 React Three (Versión Web)
+### 🔹 React Three (Web Version)
 ```bash
 git clone https://bitbucket.org/proyectos-tec-itc/cajas-kaggu
 cd cajas-kaggu
@@ -87,25 +85,26 @@ npm run dev
 
 ---
 
-## 🧪 Pruebas & Calidad
+## 🧪 Testing & Quality
 
-- Validación de trayectorias de los agentes con control de colisiones y límites.
-- Pruebas de renderizado visual (texturas, objetos 3D, sincronización con Julia).
-- Modularidad y separación de responsabilidades por archivo.
-- Pruebas manuales de la lógica de acomodo con múltiples combinaciones de cajas.
+- Pathfinding validation and collision control for agents.
+- Visual rendering tests (textures, 3D objects, sync with Julia).
+- Modular and structured file organization.
+- Manual testing of box arrangement logic with varied inputs.
 
 ---
 
-## 👥 Equipo y Créditos
+## 👥 Team & Credits
 
-Desarrollado por estudiantes del Tecnológico de Monterrey, Campus Puebla:
+Developed by students from Tecnológico de Monterrey, Campus Puebla:
 
 - 🎓 Jonathan Arredondo
 - 🎓 Kevin Núñez
 - 🎓 Rusbel Morales
 - 🎓 Pablo Coca
+
 ---
 
-## 📄 Licencia
+## 📄 License
 
-Este proyecto fue realizado con fines educativos. Todos los derechos pertenecen a los autores y al Tecnológico de Monterrey, salvo que se indique lo contrario.
+This project was developed for educational purposes. All rights reserved by the authors and Tecnológico de Monterrey unless stated otherwise.
